@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NEXUS 2.0</title>
+<style>
+  :root {
+    --bg: #b60000;
+    --panel: rgba(255, 255, 255, 0.25);
+    --btn-bg: #ffffffdd;
+    --btn-color: #000;
+    --btn-hover-bg: #fff;
+    --btn-hover-color: #b60000;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    background: var(--bg);
+  }
+
+  .background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .page-wrap {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  main.container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--panel);
+    padding: 28px;
+    border-radius: 18px;
+    backdrop-filter: blur(6px);
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  h1 img {
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 18px auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .btn-wrapper {
+    position: relative;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-color);
+    transform: translateY(-2px);
+  }
+
+  .btn-wrapper .tooltip {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 6px 10px;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s;
+    font-size: 13px;
+    width: max-content;
+    max-width: 200px;
+  }
+
+  .btn-wrapper .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #000 transparent transparent transparent;
+  }
+
+  .btn-wrapper:hover .tooltip,
+  .btn-wrapper:focus-within .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 16px;
+    background-color: transparent;
+    z-index: 10;
+  }
+
+  .toggle-btn {
+    margin-bottom: 16px;
+    background: #fff;
+    color: #b60000;
+    font-weight: bold;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 420px) {
+    h1 img { max-width: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background image -->
+<img id="backgroundDiagram" class="background-image" src="transformer.jpg" />
+
+<div class="page-wrap">
+  <main class="container">
+
+    <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
+
+    <button class="toggle-btn" onclick="toggleBackground()">Show/Hide Transformer Diagram</button>
+
+    <section class="grid">
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:i:/s/CMH098QAQC/IQDL25SZ5kB5RYCL6IfIpOXNARiSI2LojTRfzoG7iP8eiiQ?e=lKeTj7" target="_blank">ℹ️ Transformer Image</a>
+        <span class="tooltip">View the transformer image</span>
+      </div>
+
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:w:/s/CMH098QAQC/ERlOTW2Xd2JBhgd4TNGyHq0BbABgZ5neMywEISQUr48U7g?e=mM35lX" target="_blank">ℹ️ Phenolic Display</a>
+        <span class="tooltip">View the Phenolic Display document</span>
+      </div>
+
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/Ebj1TQP-KYBBnp_iPheTVEQBtCCaWAe5rHUUvBYk4hvRCA?e=yivEOH" target="_blank">ℹ️ LVT L2 IVF</a>
+        <span class="tooltip">View the LVT L2 IVF report</span>
+      </div>
+
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/EpcJix_X1ptIlQ7Vbav46XQBTXMrFZhsUCCerSEl4R7t0w?e=mM6j3P" target="_blank">ℹ️ Supporting Documents</a>
+        <span class="tooltip">View supporting documents</span>
+      </div>
+
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:w:/s/CMH098QAQC/EYYVaRKvoH1GkzkstoaYHJoBgeovE4sIYOGLjNO61DoSGw?e=MpLtU7" target="_blank">ℹ️ Pre-FOD Link</a>
+        <span class="tooltip">Access the Pre-FOD link</span>
+      </div>
+
+      <div class="btn-wrapper">
+        <a class="btn" href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/EeM9TWSOLjpGkuCigbvAmSwBeGpUZJg5p8xmRlTA8kkaSQ?e=8bPtKb" target="_blank">ℹ️ Construction Check Sheet</a>
+        <span class="tooltip">View the Construction Check Sheet</span>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="footer">© Intellectual Property of NEXUS Data Science</footer>
+
+<script>
+function toggleBackground() {
+  const bg = document.getElementById('backgroundDiagram');
+  bg.style.opacity = (bg.style.opacity == 0.15 ? 1 : 0.15);
+}
+</script>
+
+</body>
+</html>
