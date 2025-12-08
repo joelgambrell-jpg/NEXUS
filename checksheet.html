@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Construction Check Sheet</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Construction Check Sheet (Editable with Sign-off)</title>
 
 <style>
   body {
@@ -28,10 +28,34 @@
 
   .section-header {
     background: #c8e6c9;
-    padding: 8px;
+    padding: 12px 8px 8px 8px;
     font-weight: bold;
     border-radius: 4px;
-    margin-top: 20px;
+    margin-top: 30px;
+    position: relative;
+  }
+
+  /* Sign-off area styling */
+  .signoff {
+    background: #a5d6a7;
+    border: 2px solid #388e3c;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .signoff label {
+    font-weight: 600;
+    min-width: 100px;
+  }
+  .signoff input {
+    padding: 6px;
+    font-size: 1rem;
+    flex: 1 1 180px;
+    min-width: 150px;
   }
 
   .row {
@@ -48,6 +72,7 @@
 
   input[type="checkbox"] {
     transform: scale(1.3);
+    margin-left: 8px;
   }
 
   input[type="text"], input[type="date"] {
@@ -75,152 +100,213 @@
     font-weight: bold;
     cursor: pointer;
   }
+
+  /* Add row buttons */
+  .add-row-btn {
+    margin-top: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #2e7d32;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    text-decoration: underline;
+  }
 </style>
 </head>
-
 <body>
+
+<form action="/submit-checksheet" method="post">
 
 <div class="container">
   <h2>Construction Check-sheet</h2>
 
   <div class="row">
-    <label>Building Number</label>
-    <input type="text" name="building">
+    <label for="building">Building Number</label>
+    <input type="text" id="building" name="building" />
     <div></div>
   </div>
 
   <div class="row">
-    <label>Phase</label>
-    <input type="text" name="phase">
+    <label for="phase">Phase</label>
+    <input type="text" id="phase" name="phase" />
     <div></div>
   </div>
 
   <div class="row">
-    <label>Foreman</label>
-    <input type="text" name="foreman">
+    <label for="foreman">Foreman</label>
+    <input type="text" id="foreman" name="foreman" />
     <div></div>
   </div>
 
-  <!-- Section: Equipment Information -->
-  <div class="section-header">Equipment Information</div>
+  <!-- Equipment Information Section -->
+  <div class="section-header" id="equipment-info-header">Equipment Information</div>
 
-  <div class="row">
-    <label>ELF Completed</label>
-    <input type="checkbox" name="elf">
-    <input type="text" name="elf-notes" placeholder="Notes">
+  <div id="equipment-info-rows">
+    <div class="row">
+      <label for="elf-0">ELF Completed</label>
+      <input type="checkbox" id="elf-0" name="elf[]" />
+      <input type="text" name="elf_notes[]" placeholder="Notes" />
+    </div>
+
+    <div class="row">
+      <label for="labels-0">Labels Installed by QCX: Phenolic / Arc Flash</label>
+      <input type="checkbox" id="labels-0" name="labels[]" />
+      <input type="text" name="labels_notes[]" placeholder="Notes" />
+    </div>
   </div>
 
-  <div class="row">
-    <label>Labels Installed by QCX: Phenolic / Arc Flash</label>
-    <input type="checkbox" name="labels">
-    <input type="text" name="labels-notes" placeholder="Notes">
+  <button type="button" class="add-row-btn" data-section="equipment-info">+ Add Equipment Info Row</button>
+
+  <div class="signoff" id="signoff-equipment-info">
+    <label for="signoff-equipment-name">Sign-Off Name:</label>
+    <input type="text" id="signoff-equipment-name" name="signoff_equipment_name" placeholder="Name" />
+    <label for="signoff-equipment-date">Date:</label>
+    <input type="date" id="signoff-equipment-date" name="signoff_equipment_date" />
   </div>
 
-  <!-- Section: Equipment Mounted / Installation Specs -->
-  <div class="section-header">Equipment Mounted / Installation Specs</div>
+  <!-- Equipment Mounted / Installation Specs Section -->
+  <div class="section-header" id="equipment-mounted-header">Equipment Mounted / Installation Specs</div>
 
-  <div class="row">
-    <label>6” clearance from walls and panels</label>
-    <input type="checkbox" name="clearance">
-    <input type="text" name="clearance-notes">
+  <div id="equipment-mounted-rows">
+    <div class="row">
+      <label for="clearance-0">6” clearance from walls and panels</label>
+      <input type="checkbox" id="clearance-0" name="clearance[]" />
+      <input type="text" name="clearance_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="coverbolts-0">Remove front cover bolts</label>
+      <input type="checkbox" id="coverbolts-0" name="coverbolts[]" />
+      <input type="text" name="coverbolts_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="shipping-0">Shipping assembly (if required)</label>
+      <input type="checkbox" id="shipping-0" name="shipping[]" />
+      <input type="text" name="shipping_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="protect-0">Apply protect cover to equipment</label>
+      <input type="checkbox" id="protect-0" name="protect[]" />
+      <input type="text" name="protect_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="anchors-0">Anchored using 1/2” concrete wedge anchors</label>
+      <input type="checkbox" id="anchors-0" name="anchors[]" />
+      <input type="text" name="anchors_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="square-0">Housing is mounted squared and leveled</label>
+      <input type="checkbox" id="square-0" name="square[]" />
+      <input type="text" name="square_notes[]" placeholder="Notes" />
+    </div>
   </div>
 
-  <div class="row">
-    <label>Remove front cover bolts</label>
-    <input type="checkbox" name="coverbolts">
-    <input type="text" name="coverbolts-notes">
+  <button type="button" class="add-row-btn" data-section="equipment-mounted">+ Add Installation Spec Row</button>
+
+  <div class="signoff" id="signoff-equipment-mounted">
+    <label for="signoff-mounted-name">Sign-Off Name:</label>
+    <input type="text" id="signoff-mounted-name" name="signoff_mounted_name" placeholder="Name" />
+    <label for="signoff-mounted-date">Date:</label>
+    <input type="date" id="signoff-mounted-date" name="signoff_mounted_date" />
   </div>
 
-  <div class="row">
-    <label>Shipping assembly (if required)</label>
-    <input type="checkbox" name="shipping">
-    <input type="text" name="shipping-notes">
+  <!-- Internal Wiring and Termination Specs Section -->
+  <div class="section-header" id="internal-wiring-header">Internal Wiring and Termination Specs</div>
+
+  <div id="internal-wiring-rows">
+    <div class="row">
+      <label for="lineLoad-0">Install proper line/load wiring from nearest panel</label>
+      <input type="checkbox" id="lineLoad-0" name="lineLoad[]" />
+      <input type="text" name="lineLoad_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="primaryHV-0">Primary HV matches (L1-A, L2-B, L3-C)</label>
+      <input type="checkbox" id="primaryHV-0" name="primaryHV[]" />
+      <input type="text" name="primaryHV_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="phaseRotation-0">Verify primary phase rotation</label>
+      <input type="checkbox" id="phaseRotation-0" name="phaseRotation[]" />
+      <input type="text" name="phaseRotation_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="ground-0">Ground installation correct</label>
+      <input type="checkbox" id="ground-0" name="ground[]" />
+      <input type="text" name="ground_notes[]" placeholder="Notes" />
+    </div>
   </div>
 
-  <div class="row">
-    <label>Apply protect cover to equipment</label>
-    <input type="checkbox" name="protect">
-    <input type="text" name="protect-notes">
+  <button type="button" class="add-row-btn" data-section="internal-wiring">+ Add Internal Wiring Row</button>
+
+  <div class="signoff" id="signoff-internal-wiring">
+    <label for="signoff-wiring-name">Sign-Off Name:</label>
+    <input type="text" id="signoff-wiring-name" name="signoff_wiring_name" placeholder="Name" />
+    <label for="signoff-wiring-date">Date:</label>
+    <input type="date" id="signoff-wiring-date" name="signoff_wiring_date" />
   </div>
 
-  <div class="row">
-    <label>Anchored using 1/2” concrete wedge anchors</label>
-    <input type="checkbox" name="anchors">
-    <input type="text" name="anchors-notes">
+  <!-- Secondary Wiring Section -->
+  <div class="section-header" id="secondary-wiring-header">Secondary Wiring</div>
+
+  <div id="secondary-wiring-rows">
+    <div class="row">
+      <label for="secondaryWires-0">Secondary wires installed to labeling: X1-Black, X2-Red, X3-C, X4-Blue</label>
+      <input type="checkbox" id="secondaryWires-0" name="secondaryWires[]" />
+      <input type="text" name="secondaryWires_notes[]" placeholder="Notes" />
+    </div>
   </div>
 
-  <div class="row">
-    <label>Housing is mounted squared and leveled</label>
-    <input type="checkbox" name="square">
-    <input type="text" name="square-notes">
+  <button type="button" class="add-row-btn" data-section="secondary-wiring">+ Add Secondary Wiring Row</button>
+
+  <div class="signoff" id="signoff-secondary-wiring">
+    <label for="signoff-secondary-name">Sign-Off Name:</label>
+    <input type="text" id="signoff-secondary-name" name="signoff_secondary_name" placeholder="Name" />
+    <label for="signoff-secondary-date">Date:</label>
+    <input type="date" id="signoff-secondary-date" name="signoff_secondary_date" />
   </div>
 
-  <!-- Section: Internal Wiring and Termination Specs -->
-  <div class="section-header">Internal Wiring and Termination Specs</div>
+  <!-- Final Checks Section -->
+  <div class="section-header" id="final-checks-header">Final Checks</div>
 
-  <div class="row">
-    <label>Install proper line/load wiring from nearest panel</label>
-    <input type="checkbox" name="lineLoad">
-    <input type="text" name="lineLoad-notes">
+  <div id="final-checks-rows">
+    <div class="row">
+      <label for="bondedBushing-0">Housing grounded via bonded bushing</label>
+      <input type="checkbox" id="bondedBushing-0" name="bondedBushing[]" />
+      <input type="text" name="bondedBushing_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="bondingJumper-0">Bonding jumper meets code</label>
+      <input type="checkbox" id="bondingJumper-0" name="bondingJumper[]" />
+      <input type="text" name="bondingJumper_notes[]" placeholder="Notes" />
+    </div>
+    <div class="row">
+      <label for="notesAttached-0">Verify handwritten notes attached</label>
+      <input type="checkbox" id="notesAttached-0" name="notesAttached[]" />
+      <input type="text" name="notesAttached_notes[]" placeholder="Notes" />
+    </div>
   </div>
 
-  <div class="row">
-    <label>Primary HV matches (L1-A, L2-B, L3-C)</label>
-    <input type="checkbox" name="primaryHV">
-    <input type="text" name="primaryHV-notes">
+  <button type="button" class="add-row-btn" data-section="final-checks">+ Add Final Check Row</button>
+
+  <div class="signoff" id="signoff-final-checks">
+    <label for="signoff-final-name">Sign-Off Name:</label>
+    <input type="text" id="signoff-final-name" name="signoff_final_name" placeholder="Name" />
+    <label for="signoff-final-date">Date:</label>
+    <input type="date" id="signoff-final-date" name="signoff_final_date" />
   </div>
 
-  <div class="row">
-    <label>Verify primary phase rotation</label>
-    <input type="checkbox" name="phaseRotation">
-    <input type="text" name="phaseRotation-notes">
-  </div>
+  <!-- QCX Review Section (non-repeatable) -->
+  <div class="section-header" id="qcx-review-header">QCX Review</div>
 
   <div class="row">
-    <label>Ground installation correct</label>
-    <input type="checkbox" name="ground">
-    <input type="text" name="ground-notes">
-  </div>
-
-  <div class="section-header">Secondary Wiring</div>
-
-  <div class="row">
-    <label>Secondary wires installed to labeling: X1-Black, X2-Red, X3-C, X4-Blue</label>
-    <input type="checkbox" name="secondaryWires">
-    <input type="text" name="secondaryWires-notes">
-  </div>
-
-  <div class="section-header">Final Checks</div>
-
-  <div class="row">
-    <label>Housing grounded via bonded bushing</label>
-    <input type="checkbox" name="bondedBushing">
-    <input type="text" name="bondedBushing-notes">
-  </div>
-
-  <div class="row">
-    <label>Bonding jumper meets code</label>
-    <input type="checkbox" name="bondingJumper">
-    <input type="text" name="bondingJumper-notes">
-  </div>
-
-  <div class="row">
-    <label>Verify handwritten notes attached</label>
-    <input type="checkbox" name="notesAttached">
-    <input type="text" name="notesAttached-notes">
-  </div>
-
-  <div class="section-header">QCX Review</div>
-
-  <div class="row">
-    <label>Name</label>
-    <input type="text" name="qcxName">
+    <label for="qcxName">Name</label>
+    <input type="text" id="qcxName" name="qcxName" />
     <div></div>
   </div>
 
   <div class="row">
-    <label>Date</label>
-    <input type="date" name="qcxDate">
+    <label for="qcxDate">Date</label>
+    <input type="date" id="qcxDate" name="qcxDate" />
     <div></div>
   </div>
 
@@ -229,6 +315,53 @@
   </div>
 
 </div>
+
+</form>
+
+<script>
+  // Function to add new rows dynamically
+  document.querySelectorAll('.add-row-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const section = btn.getAttribute('data-section');
+      const container = document.getElementById(section + '-rows');
+      if (!container) return;
+
+      // Clone the last row in the container
+      const lastRow = container.querySelector('.row:last-child');
+      if (!lastRow) return;
+
+      const newRow = lastRow.cloneNode(true);
+
+      // Clear input values in new row and update IDs
+      newRow.querySelectorAll('input').forEach(input => {
+        if (input.type === 'checkbox') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+      });
+
+      // Update label "for" and input id to unique values
+      const inputs = newRow.querySelectorAll('input[type="checkbox"], input[type="text"]');
+      inputs.forEach((input, index) => {
+        const name = input.name; // like elf[] or elf_notes[]
+        let baseName = name.replace(/\[\]/, '');
+        let count = container.querySelectorAll('.row').length; // current count (starting at 1)
+
+        if (input.type === 'checkbox') {
+          input.id = baseName + '-' + count;
+          // Update label for attribute
+          const label = newRow.querySelector(`label[for^="${baseName}-"]`);
+          if (label) label.setAttribute('for', input.id);
+        } else if (input.type === 'text') {
+          input.id = baseName + '-notes-' + count;
+        }
+      });
+
+      container.appendChild(newRow);
+    });
+  });
+</script>
 
 </body>
 </html>
