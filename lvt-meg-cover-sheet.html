@@ -46,9 +46,9 @@ h1{
   margin-bottom:20px;
 }
 
-/* EXACT BLUE NEON PILL BUTTON STYLE */
+/* Neon pill buttons */
 .btn-wrapper{
-  margin:26px 0;
+  margin:20px 0;
 }
 
 .btn{
@@ -58,9 +58,9 @@ h1{
   font-weight:700;
   border-radius:999px;
   text-decoration:none;
-  color:#3ecbff;             /* Electric blue text */
-  background:#0a0f24;        /* Deep navy background */
-  border:2px solid #00c2ff;  /* Neon outline */
+  color:#3ecbff;
+  background:#0a0f24;
+  border:2px solid #00c2ff;
   box-shadow:
       0 0 8px   #00c2ff,
       0 0 16px  #00c2ff,
@@ -78,6 +78,26 @@ h1{
   transform:translateY(-3px);
   color:#6eeaff;
 }
+
+/* Image with buttons over it */
+.photo-block{
+  position:relative;
+  width:100%;
+  margin:30px 0;
+}
+
+.hero-img{
+  width:100%;
+  border-radius:18px;
+}
+
+.center-buttons{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  text-align:center;
+}
 </style>
 </head>
 
@@ -90,22 +110,23 @@ h1{
 
 <div class="section-title">Megohmmeter Testing of Conductors</div>
 
-<!-- LINE SIDE BUTTON -->
-<div class="btn-wrapper">
-  <a class="btn" 
-     href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQB4zdld_DAmQbY4VOAUXcHmAf7SmDkVDGCEPduYPqKKEXY?e=qZ6OKd"
-     target="_blank">
-     Line Side
-  </a>
-</div>
+<!-- IMAGE WITH BUTTONS ON TOP -->
+<div class="photo-block">
+  <img src="your-image.jpg" class="hero-img">
 
-<!-- LOAD SIDE BUTTON -->
-<div class="btn-wrapper">
-  <a class="btn" 
-     href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQBlhLsuvA8USp7ZzFiuyGW1Aa7TZBcVpZ4BvtoWGNR62AM?e=nBgi82"
-     target="_blank">
-     Load Side
-  </a>
+  <div class="center-buttons">
+    <div class="btn-wrapper">
+      <a class="btn" 
+         href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQB4zdld_DAmQbY4VOAUXcHmAf7SmDkVDGCEPduYPqKKEXY?e=qZ6OKd"
+         target="_blank">Line Side</a>
+    </div>
+
+    <div class="btn-wrapper">
+      <a class="btn" 
+         href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQBlhLsuvA8USp7ZzFiuyGW1Aa7TZBcVpZ4BvtoWGNR62AM?e=nBgi82"
+         target="_blank">Load Side</a>
+    </div>
+  </div>
 </div>
 
 </div>
