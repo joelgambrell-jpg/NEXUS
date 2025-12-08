@@ -157,15 +157,10 @@
     border-radius: 8px;
     cursor: pointer;
   }
-
-  @media (max-width: 420px) {
-    h1 img { max-width: 220px; }
-  }
 </style>
 </head>
 <body>
 
-<!-- Background image -->
 <img id="backgroundDiagram" class="background-image" src="transformer.jpg" />
 
 <div class="page-wrap">
@@ -210,7 +205,12 @@
         <a class="btn" href="checksheet.html" target="_blank">ℹ️ Construction Check Sheet</a>
         <span class="tooltip">View the Construction Check Sheet</span>
       </div>
+
     </section>
+
+      <div style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 20px;">
+        <a class="btn" href="checksheet.html" target="_blank" style="background:#39ff14; color:#000; border:2px solid #39ff14; font-size:20px; padding:20px 32px; border-radius:14px; font-weight:800;">Construction Check Sheet</a>
+      </div>
 
   </main>
 </div>
