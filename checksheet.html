@@ -1,7 +1,162 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checksheet</title></head>
-<body style="background:#b60000;color:#fff;font-family:Arial;">
-<div style="max-width:900px;margin:40px auto;background:rgba(255,255,255,0.25);padding:24px;border-radius:16px;">
-<a href="index.html" style="color:#fff;font-weight:bold;">← Back</a>
-<h1>Checksheet</h1>
-<a href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/EeM9TWSOLjpGkuCigbvAmSwBeGpUZJg5p8xmRlTA8kkaSQ?e=8bPtKb" target="_blank" style="display:inline-block;background:#fff;color:#b60000;padding:12px 16px;border-radius:10px;font-weight:bold;text-decoration:none;margin-top:20px;">Open</a>
-</div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construction Check Sheet</title>
+
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  form {
+    background: white;
+    padding: 20px;
+    max-width: 700px;
+    margin: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .field-group {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .field-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+  }
+
+  .check-item input {
+    margin-right: 8px;
+  }
+
+  button {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    background: #39ff14;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  #status {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 16px;
+  }
+</style>
+</head>
+
+<body>
+<h1>Construction Check Sheet</h1>
+
+<form id="checkForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+
+  <div class="field-group">
+    <label>Technician Name</label>
+    <input type="text" name="Technician" required>
+  </div>
+
+  <div class="field-group">
+    <label>Job Number</label>
+    <input type="text" name="JobNumber" required>
+  </div>
+
+  <div class="field-group">
+    <label>Inspection Items</label>
+
+    <div class="check-item">
+      <input type="checkbox" name="GroundingVerified">
+      <span>Grounding verified</span>
+    </div>
+
+    <div class="check-item">
+      <input type="checkbox" name="ClearancesCorrect">
+      <span>Clearances correct</span>
+    </div>
+
+    <div class="check-item">
+      <input type="checkbox" name="ConduitSecure">
+      <span>Conduit secure</span>
+    </div>
+
+    <div class="check-item">
+      <input type="checkbox" name="WiringLabeled">
+      <span>Wiring labeled</span>
+    </div>
+
+  </div>
+
+  <div class="field-group">
+    <label>Notes</label>
+    <textarea name="Notes" rows="4"></textarea>
+  </div>
+
+  <button type="submit">Submit Check Sheet</button>
+
+  <div id="status"></div>
+
+</form>
+
+<script>
+// Formspree AJAX submission (no backend needed)
+const form = document.getElementById('checkForm');
+const status = document.getElementById('status');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  status.textContent = "Submitting...";
+
+  const data = new FormData(form);
+
+  const response = await fetch(form.action, {
+    method: form.method,
+    body: data,
+    headers: { 'Accept': 'application/json' }
+  });
+
+  if (response.ok) {
+    status.textContent = "Successfully sent!";
+    form.reset();
+  } else {
+    status.textContent = "Error sending form.";
+  }
+});
+</script>
+
+</body>
+</html>
