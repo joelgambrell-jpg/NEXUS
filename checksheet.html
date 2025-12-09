@@ -87,6 +87,9 @@ let lastSavedPayload = "";
 let syncQueue = JSON.parse(localStorage.getItem('checksheet_queue') || '[]');
 let editingUnlocked = false;
 let qrStream = null;
+let scanActive = false;
+let detector;
+let canvas, ctx;
 
 // Elements
 const qrVideo = document.getElementById('qr-video');            // <video> used for QR scanning
@@ -100,18 +103,22 @@ const forceSyncBtn = document.getElementById('forceSync');
 
 // -------- QR SCAN (BarcodeDetector preferred, fallback to jsQR) ----------
 async function startQRScan() {
+  if (scanActive) return; // Prevent multiple scans
+  scanActive = true;
+
   qrStatus.textContent = 'Requesting camera...';
+
   try {
     qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     qrVideo.srcObject = qrStream;
     qrVideo.play();
 
-    const hasBarcodeDetector = ('BarcodeDetector' in window) && (window.BarcodeDetector);
-    if (hasBarcodeDetector) {
-      const detector = new BarcodeDetector({ formats: ['qr_code'] });
+    if ('BarcodeDetector' in window && window.BarcodeDetector) {
+      detector = new BarcodeDetector({ formats: ['qr_code'] });
       qrStatus.textContent = 'Scanning (native detector)...';
 
-      const tick = async () => {
+      const scanLoop = async () => {
+        if (!scanActive) return;
         try {
           const barcodes = await detector.detect(qrVideo);
           if (barcodes && barcodes.length > 0) {
@@ -119,50 +126,73 @@ async function startQRScan() {
             return;
           }
         } catch (e) {
-          // fall through to continue scanning
+          console.warn('BarcodeDetector error:', e);
+          // fallback to jsQR if error occurs
+          startJSQRScanLoop();
+          return;
         }
-        requestAnimationFrame(tick);
+        requestAnimationFrame(scanLoop);
       };
-      tick();
+      scanLoop();
     } else {
-      // fallback using jsQR
-      qrStatus.textContent = 'Scanning (fallback)...';
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      const tick = () => {
-        if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
-          canvas.width = qrVideo.videoWidth;
-          canvas.height = qrVideo.videoHeight;
-          ctx.drawImage(qrVideo, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, canvas.width, canvas.height);
-          if (code) { handleQrValue(code.data); return; }
-        }
-        requestAnimationFrame(tick);
-      };
-      tick();
+      qrStatus.textContent = 'Scanning (fallback jsQR)...';
+      startJSQRScanLoop();
     }
   } catch (err) {
     qrStatus.textContent = 'Camera denied or error: ' + err.message;
+    scanActive = false;
   }
 }
 
+function startJSQRScanLoop() {
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d');
+  }
+
+  const scanLoop = () => {
+    if (!scanActive) return;
+
+    if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+      canvas.width = qrVideo.videoWidth;
+      canvas.height = qrVideo.videoHeight;
+      ctx.drawImage(qrVideo, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+      if (code) {
+        handleQrValue(code.data);
+        return;
+      }
+    }
+    requestAnimationFrame(scanLoop);
+  };
+  scanLoop();
+}
+
 function stopQRScan() {
+  scanActive = false;
   if (qrStream) {
     qrStream.getTracks().forEach(t => t.stop());
     qrStream = null;
+  }
+  if (qrVideo) {
+    qrVideo.pause();
+    qrVideo.srcObject = null;
   }
 }
 
 function handleQrValue(value) {
   qrStatus.textContent = 'Scanned: ' + value;
-  if (value === REQUIRED_QR_VALUE) {
+
+  // Accept any 7 numeric digits or the authorized string
+  const isValidBadge = /^\d{7}$/.test(value);
+  const isAuthorized = (value === REQUIRED_QR_VALUE);
+
+  if (isValidBadge || isAuthorized) {
     unlockEditing();
   } else {
-    qrStatus.textContent = 'Unrecognized QR. Try again.';
-    // keep scanning (or stop based on your policy) - we'll continue scanning
-    // In this implementation we continue scanning so user can try again.
+    qrStatus.textContent = 'Unrecognized QR. Please scan your badge.';
+    // Continue scanning
     requestAnimationFrame(startQRScan);
   }
 }
@@ -173,24 +203,34 @@ cancelScanBtn.addEventListener('click', () => {
   // keep sheet locked; user must reopen to scan again
 });
 
-function playNexusVoice() {
-  const utterance = new SpeechSynthesisUtterance('Nexus');
-  const voices = speechSynthesis.getVoices();
-  // Try to find a male English voice, fallback to first voice
-  utterance.voice = voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('female')) || voices[0];
-  utterance.rate = 0.8;  // slower, dramatic
-  utterance.pitch = 0.6; // lower pitch
-  speechSynthesis.speak(utterance);
-}
-
 function unlockEditing() {
   editingUnlocked = true;
   stopQRScan();
   lockscreen.style.display = 'none';
   sheetContainer.classList.remove('disabled');
   qrStatus.textContent = 'Unlocked';
+
+  // Play Mortal Kombat "NEXUS" voice (via SpeechSynthesis)
   playNexusVoice();
+
   restoreLocal();
+}
+
+// Text-to-speech for "NEXUS" with Mortal Kombat style
+function playNexusVoice() {
+  const utterance = new SpeechSynthesisUtterance("NEXUS");
+  utterance.lang = 'en-US';
+  utterance.pitch = 0.6;
+  utterance.rate = 0.8;
+  utterance.volume = 1;
+  // You can tweak voice selection here, fallback if needed
+  const voices = speechSynthesis.getVoices();
+  if (voices.length) {
+    // Pick a deep, robotic or male voice if available
+    const voice = voices.find(v => v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('matt') || v.name.toLowerCase().includes('microsoft')) || voices[0];
+    utterance.voice = voice;
+  }
+  speechSynthesis.speak(utterance);
 }
 
 // Start scanning immediately when page loads
