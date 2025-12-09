@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Construction Check Sheet (Editable with Sign-off + Change Tracker)</title>
+<title>Construction Check Sheet (Editable with Sign-off + Change Tracker + QR Unlock)</title>
 
 <style>
   /* Wrapper for flex layout */
@@ -183,6 +183,30 @@
     color: #b00020;
     min-height: 1.2em;
   }
+
+  /* QR code scanner container */
+  #qr-reader {
+    width: 320px;
+    margin: 10px auto 20px;
+    border: 2px solid #4caf50;
+    border-radius: 8px;
+  }
+
+  /* Overlay when form is locked */
+  #lock-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -195,21 +219,24 @@
 
       <h2>Construction Check-sheet</h2>
 
+      <div id="qr-reader"></div>
+      <div id="lock-overlay">Scan 7-digit unlock QR code to unlock the form</div>
+
       <div class="row">
         <label for="building">Building Number</label>
-        <input type="text" id="building" name="building" />
+        <input type="text" id="building" name="building" disabled />
         <div></div>
       </div>
 
       <div class="row">
         <label for="phase">Phase</label>
-        <input type="text" id="phase" name="phase" />
+        <input type="text" id="phase" name="phase" disabled />
         <div></div>
       </div>
 
       <div class="row">
         <label for="foreman">Foreman</label>
-        <input type="text" id="foreman" name="foreman" />
+        <input type="text" id="foreman" name="foreman" disabled />
         <div></div>
       </div>
 
@@ -219,24 +246,24 @@
       <div id="equipment-info-rows">
         <div class="row">
           <label for="elf-0">ELF Completed</label>
-          <input type="checkbox" id="elf-0" name="elf[]" />
-          <input type="text" name="elf_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="elf-0" name="elf[]" disabled />
+          <input type="text" name="elf_notes[]" placeholder="Notes" disabled />
         </div>
 
         <div class="row">
           <label for="labels-0">Labels Installed by QCX: Phenolic / Arc Flash</label>
-          <input type="checkbox" id="labels-0" name="labels[]" />
-          <input type="text" name="labels_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="labels-0" name="labels[]" disabled />
+          <input type="text" name="labels_notes[]" placeholder="Notes" disabled />
         </div>
       </div>
 
-      <button type="button" class="add-row-btn" data-section="equipment-info">+ Add Equipment Info Row</button>
+      <button type="button" class="add-row-btn" data-section="equipment-info" disabled>+ Add Equipment Info Row</button>
 
       <div class="signoff" id="signoff-equipment-info">
         <label for="signoff-equipment-name">Sign-Off Name:</label>
-        <input type="text" id="signoff-equipment-name" name="signoff_equipment_name" placeholder="Name" />
+        <input type="text" id="signoff-equipment-name" name="signoff_equipment_name" placeholder="Name" disabled />
         <label for="signoff-equipment-date">Date:</label>
-        <input type="date" id="signoff-equipment-date" name="signoff_equipment_date" />
+        <input type="date" id="signoff-equipment-date" name="signoff_equipment_date" disabled />
       </div>
 
       <!-- Equipment Mounted / Installation Specs Section -->
@@ -245,43 +272,43 @@
       <div id="equipment-mounted-rows">
         <div class="row">
           <label for="clearance-0">6” clearance from walls and panels</label>
-          <input type="checkbox" id="clearance-0" name="clearance[]" />
-          <input type="text" name="clearance_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="clearance-0" name="clearance[]" disabled />
+          <input type="text" name="clearance_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="coverbolts-0">Remove front cover bolts</label>
-          <input type="checkbox" id="coverbolts-0" name="coverbolts[]" />
-          <input type="text" name="coverbolts_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="coverbolts-0" name="coverbolts[]" disabled />
+          <input type="text" name="coverbolts_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="shipping-0">Shipping assembly (if required)</label>
-          <input type="checkbox" id="shipping-0" name="shipping[]" />
-          <input type="text" name="shipping_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="shipping-0" name="shipping[]" disabled />
+          <input type="text" name="shipping_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="protect-0">Apply protect cover to equipment</label>
-          <input type="checkbox" id="protect-0" name="protect[]" />
-          <input type="text" name="protect_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="protect-0" name="protect[]" disabled />
+          <input type="text" name="protect_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="anchors-0">Anchored using 1/2” concrete wedge anchors</label>
-          <input type="checkbox" id="anchors-0" name="anchors[]" />
-          <input type="text" name="anchors_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="anchors-0" name="anchors[]" disabled />
+          <input type="text" name="anchors_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="square-0">Housing is mounted squared and leveled</label>
-          <input type="checkbox" id="square-0" name="square[]" />
-          <input type="text" name="square_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="square-0" name="square[]" disabled />
+          <input type="text" name="square_notes[]" placeholder="Notes" disabled />
         </div>
       </div>
 
-      <button type="button" class="add-row-btn" data-section="equipment-mounted">+ Add Installation Spec Row</button>
+      <button type="button" class="add-row-btn" data-section="equipment-mounted" disabled>+ Add Installation Spec Row</button>
 
       <div class="signoff" id="signoff-equipment-mounted">
         <label for="signoff-mounted-name">Sign-Off Name:</label>
-        <input type="text" id="signoff-mounted-name" name="signoff_mounted_name" placeholder="Name" />
+        <input type="text" id="signoff-mounted-name" name="signoff_mounted_name" placeholder="Name" disabled />
         <label for="signoff-mounted-date">Date:</label>
-        <input type="date" id="signoff-mounted-date" name="signoff_mounted_date" />
+        <input type="date" id="signoff-mounted-date" name="signoff_mounted_date" disabled />
       </div>
 
       <!-- Internal Wiring and Termination Specs Section -->
@@ -290,33 +317,33 @@
       <div id="internal-wiring-rows">
         <div class="row">
           <label for="lineLoad-0">Install proper line/load wiring from nearest panel</label>
-          <input type="checkbox" id="lineLoad-0" name="lineLoad[]" />
-          <input type="text" name="lineLoad_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="lineLoad-0" name="lineLoad[]" disabled />
+          <input type="text" name="lineLoad_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="primaryHV-0">Primary HV matches (L1-A, L2-B, L3-C)</label>
-          <input type="checkbox" id="primaryHV-0" name="primaryHV[]" />
-          <input type="text" name="primaryHV_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="primaryHV-0" name="primaryHV[]" disabled />
+          <input type="text" name="primaryHV_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="phaseRotation-0">Verify primary phase rotation</label>
-          <input type="checkbox" id="phaseRotation-0" name="phaseRotation[]" />
-          <input type="text" name="phaseRotation_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="phaseRotation-0" name="phaseRotation[]" disabled />
+          <input type="text" name="phaseRotation_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="ground-0">Ground installation correct</label>
-          <input type="checkbox" id="ground-0" name="ground[]" />
-          <input type="text" name="ground_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="ground-0" name="ground[]" disabled />
+          <input type="text" name="ground_notes[]" placeholder="Notes" disabled />
         </div>
       </div>
 
-      <button type="button" class="add-row-btn" data-section="internal-wiring">+ Add Internal Wiring Row</button>
+      <button type="button" class="add-row-btn" data-section="internal-wiring" disabled>+ Add Internal Wiring Row</button>
 
       <div class="signoff" id="signoff-internal-wiring">
         <label for="signoff-wiring-name">Sign-Off Name:</label>
-        <input type="text" id="signoff-wiring-name" name="signoff_wiring_name" placeholder="Name" />
+        <input type="text" id="signoff-wiring-name" name="signoff_wiring_name" placeholder="Name" disabled />
         <label for="signoff-wiring-date">Date:</label>
-        <input type="date" id="signoff-wiring-date" name="signoff_wiring_date" />
+        <input type="date" id="signoff-wiring-date" name="signoff_wiring_date" disabled />
       </div>
 
       <!-- Secondary Wiring Section -->
@@ -325,18 +352,18 @@
       <div id="secondary-wiring-rows">
         <div class="row">
           <label for="secondaryWires-0">Secondary wires installed to labeling: X1-Black, X2-Red, X3-C, X4-Blue</label>
-          <input type="checkbox" id="secondaryWires-0" name="secondaryWires[]" />
-          <input type="text" name="secondaryWires_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="secondaryWires-0" name="secondaryWires[]" disabled />
+          <input type="text" name="secondaryWires_notes[]" placeholder="Notes" disabled />
         </div>
       </div>
 
-      <button type="button" class="add-row-btn" data-section="secondary-wiring">+ Add Secondary Wiring Row</button>
+      <button type="button" class="add-row-btn" data-section="secondary-wiring" disabled>+ Add Secondary Wiring Row</button>
 
       <div class="signoff" id="signoff-secondary-wiring">
         <label for="signoff-secondary-name">Sign-Off Name:</label>
-        <input type="text" id="signoff-secondary-name" name="signoff_secondary_name" placeholder="Name" />
+        <input type="text" id="signoff-secondary-name" name="signoff_secondary_name" placeholder="Name" disabled />
         <label for="signoff-secondary-date">Date:</label>
-        <input type="date" id="signoff-secondary-date" name="signoff_secondary_date" />
+        <input type="date" id="signoff-secondary-date" name="signoff_secondary_date" disabled />
       </div>
 
       <!-- Final Checks Section -->
@@ -345,28 +372,28 @@
       <div id="final-checks-rows">
         <div class="row">
           <label for="bondedBushing-0">Housing grounded via bonded bushing</label>
-          <input type="checkbox" id="bondedBushing-0" name="bondedBushing[]" />
-          <input type="text" name="bondedBushing_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="bondedBushing-0" name="bondedBushing[]" disabled />
+          <input type="text" name="bondedBushing_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="bondingJumper-0">Bonding jumper meets code</label>
-          <input type="checkbox" id="bondingJumper-0" name="bondingJumper[]" />
-          <input type="text" name="bondingJumper_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="bondingJumper-0" name="bondingJumper[]" disabled />
+          <input type="text" name="bondingJumper_notes[]" placeholder="Notes" disabled />
         </div>
         <div class="row">
           <label for="notesAttached-0">Verify handwritten notes attached</label>
-          <input type="checkbox" id="notesAttached-0" name="notesAttached[]" />
-          <input type="text" name="notesAttached_notes[]" placeholder="Notes" />
+          <input type="checkbox" id="notesAttached-0" name="notesAttached[]" disabled />
+          <input type="text" name="notesAttached_notes[]" placeholder="Notes" disabled />
         </div>
       </div>
 
-      <button type="button" class="add-row-btn" data-section="final-checks">+ Add Final Check Row</button>
+      <button type="button" class="add-row-btn" data-section="final-checks" disabled>+ Add Final Check Row</button>
 
       <div class="signoff" id="signoff-final-checks">
         <label for="signoff-final-name">Sign-Off Name:</label>
-        <input type="text" id="signoff-final-name" name="signoff_final_name" placeholder="Name" />
+        <input type="text" id="signoff-final-name" name="signoff_final_name" placeholder="Name" disabled />
         <label for="signoff-final-date">Date:</label>
-        <input type="date" id="signoff-final-date" name="signoff_final_date" />
+        <input type="date" id="signoff-final-date" name="signoff_final_date" disabled />
       </div>
 
       <!-- QCX Review Section (non-repeatable) -->
@@ -374,18 +401,18 @@
 
       <div class="row">
         <label for="qcxName">Name</label>
-        <input type="text" id="qcxName" name="qcxName" />
+        <input type="text" id="qcxName" name="qcxName" disabled />
         <div></div>
       </div>
 
       <div class="row">
         <label for="qcxDate">Date</label>
-        <input type="date" id="qcxDate" name="qcxDate" />
+        <input type="date" id="qcxDate" name="qcxDate" disabled />
         <div></div>
       </div>
 
       <div class="submit-container">
-        <button type="submit">SUBMIT CHECK SHEET</button>
+        <button type="submit" disabled>SUBMIT CHECK SHEET</button>
       </div>
 
     </form>
@@ -402,53 +429,11 @@
 
 </div> <!-- main-wrapper -->
 
+<!-- Html5Qrcode library -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
 <script>
-  // Function to add new rows dynamically
-  document.querySelectorAll('.add-row-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const section = btn.getAttribute('data-section');
-      const container = document.getElementById(section + '-rows');
-      if (!container) return;
-
-      // Clone the last row in the container
-      const lastRow = container.querySelector('.row:last-child');
-      if (!lastRow) return;
-
-      const newRow = lastRow.cloneNode(true);
-
-      // Clear input values in new row and update IDs
-      newRow.querySelectorAll('input').forEach(input => {
-        if (input.type === 'checkbox') {
-          input.checked = false;
-        } else {
-          input.value = '';
-        }
-      });
-
-      // Update label "for" and input id to unique values
-      const inputs = newRow.querySelectorAll('input[type="checkbox"], input[type="text"]');
-      inputs.forEach((input, index) => {
-        const name = input.name; // like elf[] or elf_notes[]
-        let baseName = name.replace(/\[\]/, '');
-        let count = container.querySelectorAll('.row').length; // current count (starting at 1)
-
-        if (input.type === 'checkbox') {
-          input.id = baseName + '-' + count;
-          // Update label for attribute
-          const label = newRow.querySelector(`label[for^="${baseName}-"]`);
-          if (label) label.setAttribute('for', input.id);
-        } else if (input.type === 'text') {
-          input.id = baseName + '-notes-' + count;
-        }
-      });
-
-      container.appendChild(newRow);
-    });
-  });
-
   // === Rolling Change Tracker ===
-
-  const CHANGE_LOG_PASSCODE = "18436572"; // <-- set your passcode here
 
   const changeLogDiv = document.getElementById('change-log');
   const unlockLogBtn = document.getElementById('unlock-log-btn');
@@ -483,70 +468,245 @@
   }
 
   function getLabelText(inputElem) {
-    if (!inputElem.id) return inputElem.name || '(unknown)';
-    const label = document.querySelector(`label[for="${inputElem.id}"]`);
-    if (label) return label.textContent.trim();
-    return inputElem.name || '(unknown)';
+    if (!inputElem) return '';
+    const id = inputElem.id;
+    if (id) {
+      const label = document.querySelector(`label[for="${id}"]`);
+      if (label) return label.textContent.trim();
+    }
+    return '';
   }
 
-  function formatTimestamp(date) {
-    return date.toLocaleString();
-  }
-
-  function addChangeEntry(fieldLabel, oldVal, newVal) {
-    if (oldVal === newVal) return;
-    const timestamp = formatTimestamp(new Date());
-    const entry = `[${timestamp}] ${fieldLabel}: "${oldVal}" → "${newVal}"`;
-    changeLog.push(entry);
+  // Call this on any change with oldVal and newVal as strings
+  function logChange(fieldName, oldVal, newVal) {
+    const time = new Date().toLocaleString();
+    const logEntry = `${time} - ${fieldName}: "${oldVal}" → "${newVal}"`;
+    changeLog.push(logEntry);
     saveChangeLog();
     renderChangeLog();
   }
 
-  function setupChangeTracking() {
-    const form = document.getElementById('main-form');
-    const inputs = form.querySelectorAll('input[type="text"], input[type="date"], input[type="checkbox"]');
-
+  // Track input changes on enabled inputs
+  function attachChangeListeners() {
+    const inputs = document.querySelectorAll('input, textarea');
     inputs.forEach(input => {
-      let oldValue = input.type === 'checkbox' ? input.checked : input.value;
-
-      input.addEventListener('change', () => {
-        let newValue = input.type === 'checkbox' ? input.checked : input.value;
-        const label = getLabelText(input);
-        addChangeEntry(label, oldValue, newValue);
-        oldValue = newValue;
+      input.addEventListener('change', (e) => {
+        if (input.disabled) return;
+        const fieldName = getLabelText(input) || input.name || input.id;
+        const oldVal = input.getAttribute('data-old-val') || '';
+        const newVal = input.type === 'checkbox' ? (input.checked ? 'Checked' : 'Unchecked') : input.value;
+        if (oldVal !== newVal) {
+          logChange(fieldName, oldVal, newVal);
+          input.setAttribute('data-old-val', newVal);
+        }
       });
     });
   }
 
-  unlockLogBtn.addEventListener('click', () => {
-    passErrorDiv.style.display = 'none';
-    const pass = prompt('Enter passcode to unlock Change Log controls:');
-    if (pass === null) return;
-    if (pass === CHANGE_LOG_PASSCODE) {
-      clearLogBtn.disabled = false;
-      clearLogBtn.style.cursor = 'pointer';
-      unlockLogBtn.disabled = true;
-      unlockLogBtn.style.cursor = 'not-allowed';
-      alert('Change Log controls unlocked.');
+  // Enable inputs on unlock
+  function enableAllInputs() {
+    const inputs = document.querySelectorAll('input, textarea, button.add-row-btn, button[type=submit]');
+    inputs.forEach(input => {
+      input.disabled = false;
+    });
+  }
+
+  // Disable inputs on lock (except qr-reader)
+  function disableAllInputs() {
+    const inputs = document.querySelectorAll('input, textarea, button.add-row-btn, button[type=submit]');
+    inputs.forEach(input => {
+      input.disabled = true;
+    });
+  }
+
+  // === QR Scanner & Unlock Logic ===
+
+  const lockOverlay = document.getElementById('lock-overlay');
+  const qrReaderDiv = document.getElementById('qr-reader');
+
+  let qrScanner = null;
+  let scannerActive = false;
+  let formUnlocked = false;
+
+  function unlockForm() {
+    if (formUnlocked) return;
+    formUnlocked = true;
+
+    // Enable inputs and submit
+    enableAllInputs();
+
+    // Hide QR reader and overlay
+    if (qrScanner) {
+      qrScanner.stop().then(() => {
+        qrReaderDiv.style.display = 'none';
+        lockOverlay.style.display = 'none';
+        scannerActive = false;
+      }).catch(err => {
+        console.error("Error stopping QR scanner:", err);
+      });
     } else {
-      passErrorDiv.textContent = 'Incorrect passcode.';
-      passErrorDiv.style.display = 'block';
+      qrReaderDiv.style.display = 'none';
+      lockOverlay.style.display = 'none';
+    }
+  }
+
+  function startScanner() {
+    if (scannerActive) return;
+    scannerActive = true;
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+    qrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      qrCodeMessage => {
+        const code = qrCodeMessage.trim();
+        logChange('QR Scan Attempt', '(no old value)', code);
+
+        // Check if code is exactly 7 digits (only numbers)
+        if (/^\d{7}$/.test(code)) {
+          logChange('Form Unlock', '(locked)', `Unlocked with code: ${code}`);
+          unlockForm();
+        } else {
+          logChange('Form Unlock Attempt Failed', '(locked)', `Attempted with code: ${code}`);
+        }
+      },
+      errorMessage => {
+        // ignore scan errors silently
+      }
+    ).catch(err => {
+      console.error("QR Scanner start error:", err);
+      scannerActive = false;
+    });
+  }
+
+  // === Add row buttons ===
+
+  function addRow(section) {
+    const containerMap = {
+      'equipment-info': 'equipment-info-rows',
+      'equipment-mounted': 'equipment-mounted-rows',
+      'internal-wiring': 'internal-wiring-rows',
+      'secondary-wiring': 'secondary-wiring-rows',
+      'final-checks': 'final-checks-rows'
+    };
+    const nameMap = {
+      'equipment-info': ['elf', 'elf_notes', 'labels', 'labels_notes'],
+      'equipment-mounted': ['clearance', 'clearance_notes', 'coverbolts', 'coverbolts_notes', 'shipping', 'shipping_notes', 'protect', 'protect_notes', 'anchors', 'anchors_notes', 'square', 'square_notes'],
+      'internal-wiring': ['lineLoad', 'lineLoad_notes', 'primaryHV', 'primaryHV_notes', 'phaseRotation', 'phaseRotation_notes', 'ground', 'ground_notes'],
+      'secondary-wiring': ['secondaryWires', 'secondaryWires_notes'],
+      'final-checks': ['bondedBushing', 'bondedBushing_notes', 'bondingJumper', 'bondingJumper_notes', 'notesAttached', 'notesAttached_notes']
+    };
+
+    const containerId = containerMap[section];
+    if (!containerId) return;
+
+    const container = document.getElementById(containerId);
+
+    let html = '<div class="row">';
+    // We'll generate pairs of checkbox + notes input
+    const pairs = [];
+    for (let i = 0; i < nameMap[section].length; i += 2) {
+      const checkName = nameMap[section][i];
+      const noteName = nameMap[section][i + 1];
+      pairs.push({ checkName, noteName });
+    }
+
+    // For simplicity, only add one checkbox+notes pair row per click for this demo:
+    // Find first pair not present or add one more
+
+    // Actually add one new checkbox + notes
+    // This demo adds only one pair per button click, so we add the first pair with index 0 or more with incrementing index.
+
+    // Find the next index based on existing rows
+    const existingRows = container.querySelectorAll('.row').length;
+    // We'll add checkbox + notes for the first pair only for now
+    // For simplicity in this demo, only add the first pair type per section
+    // (You can customize more complex logic as needed)
+
+    // Example: for equipment-info, add new row with elf checkbox and notes (or labels if you want)
+    // For a more advanced dynamic addition, you'd replicate the existing structure
+
+    // But for simplicity, clone the first row inside container and increment IDs and names
+
+    if (container.children.length === 0) {
+      alert("No template rows found to clone.");
+      return;
+    }
+
+    const firstRow = container.children[0];
+    const newRow = firstRow.cloneNode(true);
+
+    // Update IDs and names for inputs inside newRow
+    const inputs = newRow.querySelectorAll('input');
+    inputs.forEach(input => {
+      // Increment numeric suffix in id
+      const idMatch = input.id.match(/^(.+?)-(\d+)$/);
+      if (idMatch) {
+        const base = idMatch[1];
+        let num = parseInt(idMatch[2]);
+        num = existingRows; // Use the current number of rows as new index
+        input.id = base + '-' + num;
+      }
+      // Update name to have [] for arrays
+      if (input.name && input.name.endsWith('[]')) {
+        // name stays same
+      } else if (input.name) {
+        input.name = input.name + '[]';
+      }
+      input.value = '';
+      if (input.type === 'checkbox') input.checked = false;
+    });
+
+    container.appendChild(newRow);
+  }
+
+  // Attach add row buttons listeners
+  function setupAddRowButtons() {
+    const addRowButtons = document.querySelectorAll('button.add-row-btn');
+    addRowButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+        const section = button.getAttribute('data-section');
+        addRow(section);
+      });
+    });
+  }
+
+  // === Change Log Unlock & Clear ===
+
+  unlockLogBtn.addEventListener('click', () => {
+    const pass = prompt('Enter password to unlock change log editing:');
+    if (pass === 'admin123') {
+      clearLogBtn.disabled = false;
+      unlockLogBtn.disabled = true;
+      passErrorDiv.textContent = '';
+      changeLogDiv.contentEditable = true;
+      changeLogDiv.style.backgroundColor = '#fff';
+      alert('Change log unlocked for editing. You can clear it now.');
+    } else {
+      passErrorDiv.textContent = 'Incorrect password.';
     }
   });
 
   clearLogBtn.addEventListener('click', () => {
-    if (!clearLogBtn.disabled) {
-      if (confirm('Are you sure you want to clear the change log? This action cannot be undone.')) {
-        changeLog = [];
-        saveChangeLog();
-        renderChangeLog();
-      }
-    }
+    if (!confirm('Are you sure you want to clear the change log? This cannot be undone.')) return;
+    changeLog = [];
+    saveChangeLog();
+    renderChangeLog();
+    clearLogBtn.disabled = true;
+    unlockLogBtn.disabled = false;
+    changeLogDiv.contentEditable = false;
+    changeLogDiv.style.backgroundColor = '#f9f9f9';
   });
 
-  window.addEventListener('load', () => {
+  // === Initialization on page load ===
+  window.addEventListener('DOMContentLoaded', () => {
     loadChangeLog();
-    setupChangeTracking();
+    attachChangeListeners();
+    setupAddRowButtons();
+    disableAllInputs(); // Locked by default
+    startScanner();
   });
 </script>
 
