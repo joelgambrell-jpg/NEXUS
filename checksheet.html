@@ -154,28 +154,6 @@
     margin-bottom: 12px;
   }
 
-  #notify-controls {
-    margin-bottom: 8px;
-  }
-
-  #notify-email-display {
-    display: inline-block;
-    font-size: 0.9rem;
-    margin-right: 8px;
-    color: #333;
-    vertical-align: middle;
-  }
-
-  #set-notify-email-btn {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    background: #1976d2;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
   #unlock-log-btn, #clear-log-btn {
     padding: 8px 14px;
     font-size: 1rem;
@@ -229,28 +207,6 @@
     font-weight: bold;
     text-align: center;
   }
-
-  /* Inline-edit display for disabled text inputs */
-  .inline-span {
-    display: inline-block;
-    padding: 6px;
-    min-height: 24px;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    background: transparent;
-    cursor: text;
-    width: 100%;
-    box-sizing: border-box;
-    color: #222;
-  }
-  .inline-span.placeholder {
-    color: #888;
-    font-style: italic;
-  }
-  .inline-span:hover {
-    border-color: #ddd;
-    background: #fff;
-  }
 </style>
 </head>
 <body>
@@ -264,7 +220,7 @@
       <h2>Construction Check-sheet</h2>
 
       <div id="qr-reader"></div>
-      <div id="lock-overlay">Scan QR code on badge to unlock the form</div>
+      <div id="lock-overlay">Scan 7-digit unlock QR code to unlock the form</div>
 
       <div class="row">
         <label for="building">Building Number</label>
@@ -466,13 +422,6 @@
   <div id="change-tracker-sidebar">
     <h3>Change Tracker (read-only)</h3>
     <div id="change-log">(No changes recorded)</div>
-
-    <!-- Notification controls: set recipient email for sign-off notifications -->
-    <div id="notify-controls">
-      <span id="notify-email-display">(notify email not set)</span>
-      <button id="set-notify-email-btn" title="Set recipient for sign-off notifications">Set Notification Email</button>
-    </div>
-
     <button id="unlock-log-btn">Unlock Change Log</button>
     <button id="clear-log-btn" disabled>Clear Change Log</button>
     <div id="log-pass-error"></div>
@@ -529,7 +478,7 @@
 
   unlockLogBtn.addEventListener('click', () => {
     const pass = prompt('Enter password to unlock the change log:');
-    if (pass === '18436572') {
+    if (pass === 'unlocklog123') {
       changeLogDiv.contentEditable = "true";
       changeLogDiv.style.backgroundColor = '#ffffe0';
       clearLogBtn.disabled = false;
@@ -557,27 +506,13 @@
 
   let scannerActive = false;
   let qrScanner = null;
-  let formIsDisabled = true; // track form disabled state (mirrors setFormDisabled)
-
-  // Per-field temporary edit config
-  const fieldUnlockEnabled = true;               // toggle to allow per-field edits while locked
-  const fieldUnlockPassword = 'fieldunlock123';  // password required to temporarily unlock a single field
 
   // Disable all inputs and buttons initially
   function setFormDisabled(disabled) {
-    formIsDisabled = !!disabled;
-
-    const inputs = mainForm.querySelectorAll('input, button, textarea, select');
+    const inputs = mainForm.querySelectorAll('input, button');
     inputs.forEach(input => {
-      // keep control buttons in the sidebar unaffected
       if (input.id === 'unlock-log-btn' || input.id === 'clear-log-btn') return;
-      // Keep checkboxes disabled/enabled as before
-      if (input.type === 'checkbox' || input.type === 'radio' || input.tagName.toLowerCase() === 'select') {
-        input.disabled = disabled;
-      } else {
-        // for text inputs & textareas we keep them disabled attribute, but inline-edit UI will handle showing spans
-        input.disabled = disabled;
-      }
+      input.disabled = disabled;
     });
 
     // Disable Add Row buttons
@@ -585,167 +520,9 @@
     addButtons.forEach(btn => {
       btn.disabled = disabled;
     });
-
-    // Submit button follows same disabled state
-    const submitBtn = mainForm.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = disabled;
-
-    updateInlineDisplays();
   }
 
   setFormDisabled(true);
-
-  // Inline edit helpers:
-  // For text inputs and textareas, when they are disabled we display a span that shows the value.
-  // When the form is unlocked (disabled=false) the actual inputs are shown for editing.
-  function createSpanForInput(input) {
-    const span = document.createElement('div');
-    span.className = 'inline-span';
-    const val = input.value || input.placeholder || '';
-    if (!val) span.classList.add('placeholder');
-    span.textContent = val || (input.placeholder || '');
-    span.dataset.refInputName = input.name || input.id || '';
-    // copy minimal styling to match width
-    span.style.minHeight = getComputedStyle(input).height || '24px';
-
-    span.addEventListener('click', () => {
-      // If form is unlocked, behave exactly as before: show the real input
-      if (!formIsDisabled) {
-        span.style.display = 'none';
-        input.style.display = '';
-        input.disabled = false;
-        input.focus();
-        if (input.select) input.select();
-        return;
-      }
-
-      // Form is locked. If per-field unlocks are disabled, notify user.
-      if (!fieldUnlockEnabled) {
-        alert('Unlock the form (scan QR) to edit this field.');
-        return;
-      }
-
-      // Ask for per-field password (optional per-field unlock)
-      const pass = prompt('Enter password to edit this single field (leave blank to cancel):');
-      // If user cancelled prompt (pass===null) just return
-      if (pass === null) return;
-
-      if (pass === fieldUnlockPassword) {
-        // Temporarily enable this input only
-        span.style.display = 'none';
-        input.style.display = '';
-        input.disabled = false;
-        input.dataset.tempUnlocked = 'true';
-        input.focus();
-        if (input.select) input.select();
-      } else {
-        alert('Incorrect password. Field remains locked.');
-      }
-    });
-
-    return span;
-  }
-
-  // Swap inputs <-> spans depending on formIsDisabled
-  function updateInlineDisplays() {
-    // For all text-like controls: inputs[type=text], input[type=date], textarea
-    const textSelectors = 'input[type="text"], input[type="date"], textarea, input[type="search"], input[type="tel"], input[type="email"]';
-    const elements = mainForm.querySelectorAll(textSelectors);
-
-    elements.forEach(el => {
-      // ignore invisible template or fields that are not intended to be inline edited (we still support them)
-      // If a span already exists right after this input, keep it
-      let span = el.nextElementSibling && el.nextElementSibling.classList && el.nextElementSibling.classList.contains('inline-span') ? el.nextElementSibling : null;
-
-      // If input was temporarily unlocked earlier, keep it visible regardless of global formIsDisabled,
-      // until it blurs and attachBlurLogging handles re-hiding.
-      const isTempUnlocked = el.dataset.tempUnlocked === 'true';
-
-      if (formIsDisabled && !isTempUnlocked) {
-        // show span, hide the input so it looks like read-only text
-        if (!span) {
-          span = createSpanForInput(el);
-          el.parentNode.insertBefore(span, el.nextSibling);
-        } else {
-          // update span text to current input value
-          const val = el.value || el.placeholder || '';
-          span.textContent = val || (el.placeholder || '');
-          span.classList.toggle('placeholder', !val);
-        }
-        el.style.display = 'none';
-        el.disabled = true;
-      } else {
-        // form unlocked or this field is temporarily unlocked: remove span (if present) and show input
-        if (span) span.remove();
-        el.style.display = '';
-        // If it's a temporary unlock, do not change disabled state here; leave input enabled.
-        if (!isTempUnlocked) {
-          el.disabled = false;
-        }
-      }
-    });
-  }
-
-  // When an input loses focus we should update its span (if any), disable it again (if the whole form is still disabled),
-  // and log changes.
-  function attachBlurLogging(el) {
-    el.addEventListener('blur', () => {
-      const span = el.nextElementSibling && el.nextElementSibling.classList && el.nextElementSibling.classList.contains('inline-span') ? el.nextElementSibling : null;
-      const oldVal = lastValues.get(el);
-      const newVal = getInputValue(el);
-
-      if (oldVal !== newVal) {
-        const label = mainForm.querySelector(`label[for="${el.id}"]`);
-        const fieldName = label ? label.textContent.trim() : el.name || el.id;
-        logChange(fieldName, oldVal, newVal);
-        lastValues.set(el, newVal);
-      }
-
-      // If this input was temporarily unlocked, clear that flag and restore disabled state + span
-      if (el.dataset.tempUnlocked === 'true') {
-        delete el.dataset.tempUnlocked;
-        if (span) {
-          span.textContent = el.value || el.placeholder || '';
-          span.classList.toggle('placeholder', !el.value);
-          el.style.display = 'none';
-          el.disabled = true;
-          span.style.display = '';
-        } else {
-          // create span if none existed
-          updateInlineDisplays();
-        }
-        // If this element is a sign-off field, attempt to trigger notification now that it blurred.
-        attemptSignoffNotificationForInput(el);
-        return;
-      }
-
-      // For the normal case, if the form is supposed to be disabled after editing,
-      // re-hide inputs if formIsDisabled is true. In our UX, inputs remain editable when the form is unlocked.
-      if (formIsDisabled) {
-        if (span) {
-          span.textContent = el.value || el.placeholder || '';
-          span.classList.toggle('placeholder', !el.value);
-          el.style.display = 'none';
-          el.disabled = true;
-          span.style.display = '';
-        } else {
-          // no span present, nothing to do
-          el.disabled = true;
-        }
-      }
-
-      // If this element is a sign-off field, attempt to trigger notification now that it blurred.
-      attemptSignoffNotificationForInput(el);
-    });
-
-    // allow Enter to finish editing for single-line inputs
-    el.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter' && el.tagName.toLowerCase() === 'input') {
-        ev.preventDefault();
-        el.blur();
-      }
-    });
-  }
 
   // Unlock form and stop scanner
   function unlockForm() {
@@ -833,16 +610,12 @@
   // Start scanner on page load
   window.addEventListener('load', () => {
     startScanner();
-    // create initial spans for disabled inputs
-    updateInlineDisplays();
-    loadNotifyEmailUI();
   });
 
   // === Track form changes to log them ===
 
   // Utility: get string value for input element
   function getInputValue(input) {
-    if (!input) return '';
     if (input.type === 'checkbox') return input.checked;
     return input.value;
   }
@@ -853,7 +626,7 @@
 
   formElements.forEach(el => {
     lastValues.set(el, getInputValue(el));
-    // attach change logging for enabled controls
+
     el.addEventListener('change', () => {
       const oldVal = lastValues.get(el);
       const newVal = getInputValue(el);
@@ -865,186 +638,7 @@
         lastValues.set(el, newVal);
       }
     });
-
-    // For text-like elements attach blur handler to support inline-edit finalization
-    const tagn = el.tagName.toLowerCase();
-    if (tagn === 'textarea' || (el.type && (el.type === 'text' || el.type === 'date' || el.type === 'search' || el.type === 'tel' || el.type === 'email'))) {
-      attachBlurLogging(el);
-    }
   });
-
-  // === Sign-off notification logic ===
-
-  // Map of signoff sections to their name and date input IDs and friendly labels
-  const signoffSections = {
-    equipment: {
-      nameId: 'signoff-equipment-name',
-      dateId: 'signoff-equipment-date',
-      label: 'Equipment Info Sign-off'
-    },
-    mounted: {
-      nameId: 'signoff-mounted-name',
-      dateId: 'signoff-mounted-date',
-      label: 'Equipment Mounted Sign-off'
-    },
-    wiring: {
-      nameId: 'signoff-wiring-name',
-      dateId: 'signoff-wiring-date',
-      label: 'Internal Wiring Sign-off'
-    },
-    secondary: {
-      nameId: 'signoff-secondary-name',
-      dateId: 'signoff-secondary-date',
-      label: 'Secondary Wiring Sign-off'
-    },
-    final: {
-      nameId: 'signoff-final-name',
-      dateId: 'signoff-final-date',
-      label: 'Final Checks Sign-off'
-    },
-    qcx: {
-      nameId: 'qcxName',
-      dateId: 'qcxDate',
-      label: 'QCX Review'
-    }
-  };
-
-  // localStorage key prefix for notifications
-  const NOTIFIED_KEY_PREFIX = 'checksheet_notified_';
-  const NOTIFY_EMAIL_KEY = 'checksheet_notify_email';
-
-  // Exposed UI controls
-  const setNotifyBtn = document.getElementById('set-notify-email-btn');
-  const notifyEmailDisplay = document.getElementById('notify-email-display');
-
-  function loadNotifyEmailUI() {
-    const email = localStorage.getItem(NOTIFY_EMAIL_KEY) || '';
-    notifyEmailDisplay.textContent = email ? `Notify: ${email}` : '(notify email not set)';
-  }
-
-  setNotifyBtn.addEventListener('click', () => {
-    const current = localStorage.getItem(NOTIFY_EMAIL_KEY) || '';
-    const input = prompt('Enter email address to receive sign-off notifications:', current);
-    if (input === null) return; // cancelled
-    const trimmed = (input || '').trim();
-    if (trimmed) {
-      localStorage.setItem(NOTIFY_EMAIL_KEY, trimmed);
-      notifyEmailDisplay.textContent = `Notify: ${trimmed}`;
-    } else {
-      localStorage.removeItem(NOTIFY_EMAIL_KEY);
-      notifyEmailDisplay.textContent = '(notify email not set)';
-    }
-  });
-
-  // Helper to check if a section already triggered a notification
-  function isSectionNotified(sectionKey) {
-    return localStorage.getItem(NOTIFIED_KEY_PREFIX + sectionKey) === 'true';
-  }
-
-  function markSectionNotified(sectionKey) {
-    localStorage.setItem(NOTIFIED_KEY_PREFIX + sectionKey, 'true');
-  }
-
-  // Compose a mailto: link and open user's mail client to create the email.
-  // We use mailto because there's no backend configured; this ensures at least an email is composed.
-  function sendSignoffEmail(recipient, subject, body) {
-    // Basic URL-encoding
-    const mailto = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    // Attempt to open user's mail client
-    window.location.href = mailto;
-    // Log that we queued an email (even though the client handles sending)
-    logChange('Notification', '(queued)', `Opened mail client for ${recipient} (${subject})`);
-  }
-
-  // Build body text with some context fields
-  function buildSignoffEmailBody(sectionLabel, name, date) {
-    const building = document.getElementById('building') ? document.getElementById('building').value : '';
-    const phase = document.getElementById('phase') ? document.getElementById('phase').value : '';
-    const foreman = document.getElementById('foreman') ? document.getElementById('foreman').value : '';
-
-    let body = `${sectionLabel} completed.\n\n`;
-    body += `Sign-off name: ${name}\n`;
-    body += `Sign-off date: ${date}\n\n`;
-    if (building) body += `Building: ${building}\n`;
-    if (phase) body += `Phase: ${phase}\n`;
-    if (foreman) body += `Foreman: ${foreman}\n`;
-    body += `\n--\nThis email was generated from the Construction Check-sheet (in-browser).`;
-    return body;
-  }
-
-  // Attempt to trigger notification for a section (if name & date present and not already notified)
-  function attemptSignoffNotification(sectionKey) {
-    const section = signoffSections[sectionKey];
-    if (!section) return;
-
-    const nameEl = document.getElementById(section.nameId);
-    const dateEl = document.getElementById(section.dateId);
-    if (!nameEl || !dateEl) return;
-
-    const nameVal = (nameEl.value || '').trim();
-    const dateVal = (dateEl.value || '').trim();
-
-    if (!nameVal || !dateVal) return; // both must be present
-
-    if (isSectionNotified(sectionKey)) return; // already notified previously
-
-    // get recipient
-    let recipient = localStorage.getItem(NOTIFY_EMAIL_KEY) || '';
-    if (!recipient) {
-      // ask the current user to provide a recipient email address
-      recipient = prompt('Enter the email address that should receive sign-off notifications:');
-      if (recipient === null) {
-        // user cancelled; do not mark notified
-        return;
-      }
-      recipient = (recipient || '').trim();
-      if (!recipient) {
-        alert('No email provided; notification cancelled.');
-        return;
-      }
-      localStorage.setItem(NOTIFY_EMAIL_KEY, recipient);
-      notifyEmailDisplay.textContent = `Notify: ${recipient}`;
-    }
-
-    // Compose email
-    const subject = `${section.label} completed for ${document.getElementById('building') ? document.getElementById('building').value || 'building' : 'building'}`;
-    const body = buildSignoffEmailBody(section.label, nameVal, dateVal);
-
-    // Mark notified (so we don't send duplicate notifications) BEFORE opening mail client to avoid duplicates on quick repeated events.
-    markSectionNotified(sectionKey);
-
-    // Log and open mailto to let the user send (or it will open their mail client)
-    sendSignoffEmail(recipient, subject, body);
-  }
-
-  // Called when an input blurs/changes to check if it belongs to a signoff and trigger attempt as needed.
-  function attemptSignoffNotificationForInput(inputEl) {
-    if (!inputEl || !inputEl.id) return;
-
-    // iterate sections and see if this input belongs to any
-    for (const key of Object.keys(signoffSections)) {
-      const s = signoffSections[key];
-      if (s.nameId === inputEl.id || s.dateId === inputEl.id) {
-        attemptSignoffNotification(key);
-        break;
-      }
-    }
-  }
-
-  // Attach listeners to signoff fields so notification logic runs when name/date get filled/edited.
-  for (const key of Object.keys(signoffSections)) {
-    const s = signoffSections[key];
-    const nameEl = document.getElementById(s.nameId);
-    const dateEl = document.getElementById(s.dateId);
-    if (nameEl) {
-      nameEl.addEventListener('change', () => attemptSignoffNotification(key));
-      nameEl.addEventListener('blur', () => attemptSignoffNotification(key));
-    }
-    if (dateEl) {
-      dateEl.addEventListener('change', () => attemptSignoffNotification(key));
-      dateEl.addEventListener('blur', () => attemptSignoffNotification(key));
-    }
-  }
 
   // === Add row button logic ===
 
@@ -1069,13 +663,19 @@
     const newRow = document.createElement('div');
     newRow.className = 'row';
 
+    // We need to create label, checkbox, and notes input with proper ids and names
+    // For label's for attribute and input ids, use `${name}-${index}`
+    // For names, e.g. name="elf[]" or name="elf_notes[]" depending on section
+
     let fieldBase = '';
     switch (section) {
       case 'equipment-info':
+        // Two fields per row: elf and labels? The original code had two rows. Here just create one row with one checkbox and one notes input?
+        // For simplicity, add a single checkbox with name="elf[]" and notes "elf_notes[]"
         fieldBase = 'elf';
         break;
       case 'equipment-mounted':
-        fieldBase = 'clearance';
+        fieldBase = 'clearance'; // you can customize this if needed
         break;
       case 'internal-wiring':
         fieldBase = 'lineLoad';
@@ -1100,14 +700,14 @@
     checkbox.type = 'checkbox';
     checkbox.id = `${fieldBase}-${index}`;
     checkbox.name = `${fieldBase}[]`;
-    checkbox.disabled = formIsDisabled;
+    checkbox.disabled = false;
 
     // Notes input
     const notesInput = document.createElement('input');
     notesInput.type = 'text';
     notesInput.name = `${fieldBase}_notes[]`;
     notesInput.placeholder = 'Notes';
-    notesInput.disabled = formIsDisabled;
+    notesInput.disabled = false;
 
     newRow.appendChild(label);
     newRow.appendChild(checkbox);
@@ -1115,7 +715,7 @@
 
     container.appendChild(newRow);
 
-    // Register in lastValues and attach logging + inline UI
+    // Add change event listeners for logging on these new inputs
     [checkbox, notesInput].forEach(el => {
       lastValues.set(el, getInputValue(el));
       el.addEventListener('change', () => {
@@ -1129,10 +729,6 @@
         }
       });
     });
-
-    // For notesInput attach blur logging and create span if needed
-    attachBlurLogging(notesInput);
-    updateInlineDisplays();
   }
 
   // Attach event listeners to all add-row buttons
@@ -1144,12 +740,6 @@
       addRow(section);
     });
   });
-
-  // Observe future additions to the form to ensure inline spans are created properly
-  const observer = new MutationObserver(() => {
-    updateInlineDisplays();
-  });
-  observer.observe(mainForm, { childList: true, subtree: true });
 
 </script>
 
