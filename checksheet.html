@@ -35,9 +35,9 @@
 <!-- QR AUTH LOCK SCREEN -->
 <div id="lockscreen" class="locked-overlay">
   <div id="qr-area">
-    <h3>Scan QR Code to Unlock</h3>
+    <h3>Please scan your badge</h3>
     <video id="qr-video" autoplay playsinline></video>
-    <p id="qr-status">Waiting for scan...</p>
+    <p id="qr-status">Please scan your badge</p>
     <div style="margin-top:12px;"><button id="cancelScan" class="ghost">Cancel</button></div>
   </div>
 </div>
@@ -100,7 +100,7 @@ const forceSyncBtn = document.getElementById('forceSync');
 
 // -------- QR SCAN (BarcodeDetector preferred, fallback to jsQR) ----------
 async function startQRScan() {
-  qrStatus.textContent = 'Requesting camera...';
+  qrStatus.textContent = 'Please scan your badge';
   try {
     qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     qrVideo.srcObject = qrStream;
