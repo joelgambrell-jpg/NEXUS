@@ -1,507 +1,747 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Construction Form with Full Features</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: auto;
-      padding: 1rem;
-    }
-    h1, h2 {
-      margin-bottom: 0.5rem;
-    }
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .row label {
-      min-width: 140px;
-      user-select: none;
-    }
-    input[type="text"], input[type="password"] {
-      flex: 1;
-      padding: 0.25rem;
-    }
-    .add-row-btn {
-      margin-bottom: 1rem;
-      cursor: pointer;
-      background: #1976d2;
-      border: none;
-      color: white;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-    #change-log {
-      white-space: pre-wrap;
-      background: #f9f9f9;
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      height: 120px;
-      overflow-y: auto;
-      margin-top: 0.5rem;
-      font-family: monospace;
-      font-size: 0.85rem;
-    }
-    #change-log[contenteditable="true"] {
-      background: #fffbe6;
-      border-color: #f1c40f;
-    }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .btn-container {
-      margin-top: 1rem;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    #log-pass-error {
-      color: red;
-      font-weight: bold;
-      margin-left: 1rem;
-    }
-    /* QR Scanner container */
-    #qr-scanner-container {
-      margin-top: 1rem;
-      border: 2px dashed #1976d2;
-      padding: 0.5rem;
-      display: none;
-      max-width: 320px;
-    }
-    #qr-video {
-      width: 100%;
-      border-radius: 4px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Construction Check Sheet (Editable with Sign-off + Change Tracker + QR Unlock)</title>
+
+<style>
+  /* Wrapper for flex layout */
+  .main-wrapper {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  /* Form container grows to fill */
+  .container {
+    flex-grow: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #ccc;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f1f1f1;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .section-header {
+    background: #c8e6c9;
+    padding: 12px 8px 8px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-top: 30px;
+    position: relative;
+  }
+
+  /* Sign-off area styling */
+  .signoff {
+    background: #a5d6a7;
+    border: 2px solid #388e3c;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .signoff label {
+    font-weight: 600;
+    min-width: 100px;
+  }
+  .signoff input {
+    padding: 6px;
+    font-size: 1rem;
+    flex: 1 1 180px;
+    min-width: 150px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .row label {
+    font-weight: 500;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.3);
+    margin-left: 8px;
+  }
+
+  input[type="text"], input[type="date"] {
+    width: 100%;
+    padding: 6px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    height: 80px;
+  }
+
+  .submit-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  button {
+    background: #39ff14;
+    padding: 18px 28px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* Add row buttons */
+  .add-row-btn {
+    margin-top: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #2e7d32;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    text-decoration: underline;
+  }
+
+  /* Change tracker sidebar styles */
+  #change-tracker-sidebar {
+    width: 360px;
+    background: #fff8dc;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    max-height: 80vh;
+    position: sticky;
+    top: 20px;
+    font-family: monospace, monospace;
+    font-size: 0.9rem;
+  }
+
+  #change-tracker-sidebar h3 {
+    margin-top: 0;
+  }
+
+  #change-log {
+    flex-grow: 1;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 8px;
+    white-space: pre-wrap;
+    margin-bottom: 12px;
+  }
+
+  #unlock-log-btn, #clear-log-btn {
+    padding: 8px 14px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+
+  #unlock-log-btn {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  #clear-log-btn {
+    background-color: #f44336;
+    color: white;
+  }
+
+  #clear-log-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #log-pass-error {
+    color: #b00020;
+    min-height: 1.2em;
+  }
+
+  /* QR code scanner container */
+  #qr-reader {
+    width: 320px;
+    margin: 10px auto 20px;
+    border: 2px solid #4caf50;
+    border-radius: 8px;
+  }
+
+  /* Overlay when form is locked */
+  #lock-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
 
-  <h1>Construction Form</h1>
-  <form id="main-form">
+<div class="main-wrapper">
 
-    <!-- Equipment Info Section -->
-    <h2>Equipment Info</h2>
-    <div id="elf-rows"></div>
-    <button type="button" class="add-row-btn" data-section="equipment-info">Add Equipment Info Row</button>
+  <div class="container">
 
-    <!-- Equipment Mounted Section -->
-    <h2>Equipment Mounted</h2>
-    <div id="clearance-rows"></div>
-    <button type="button" class="add-row-btn" data-section="equipment-mounted">Add Equipment Mounted Row</button>
+    <form action="/submit-checksheet" method="post" id="main-form">
 
-    <!-- Internal Wiring Section -->
-    <h2>Internal Wiring</h2>
-    <div id="lineLoad-rows"></div>
-    <button type="button" class="add-row-btn" data-section="internal-wiring">Add Internal Wiring Row</button>
+      <h2>Construction Check-sheet</h2>
 
-    <!-- Secondary Wiring Section -->
-    <h2>Secondary Wiring</h2>
-    <div id="secondaryWires-rows"></div>
-    <button type="button" class="add-row-btn" data-section="secondary-wiring">Add Secondary Wiring Row</button>
+      <div id="qr-reader"></div>
+      <div id="lock-overlay">Scan 7-digit unlock QR code to unlock the form</div>
 
-    <!-- Final Checks Section -->
-    <h2>Final Checks</h2>
-    <div id="bondedBushing-rows"></div>
-    <button type="button" class="add-row-btn" data-section="final-checks">Add Final Check Row</button>
+      <div class="row">
+        <label for="building">Building Number</label>
+        <input type="text" id="building" name="building" disabled />
+        <div></div>
+      </div>
 
-    <!-- Example of a static input outside dynamic sections -->
-    <h2>Sign Off</h2>
-    <label for="sign-off-name">Sign Off Name:</label>
-    <input type="text" id="sign-off-name" name="signOffName" placeholder="Enter your name" />
+      <div class="row">
+        <label for="phase">Phase</label>
+        <input type="text" id="phase" name="phase" disabled />
+        <div></div>
+      </div>
 
-  </form>
+      <div class="row">
+        <label for="foreman">Foreman</label>
+        <input type="text" id="foreman" name="foreman" disabled />
+        <div></div>
+      </div>
 
-  <!-- Change Log Display -->
-  <h2>Change Log</h2>
-  <div id="change-log" tabindex="0">(No changes recorded)</div>
+      <!-- Equipment Information Section -->
+      <div class="section-header" id="equipment-info-header">Equipment Information</div>
 
-  <div class="btn-container">
-    <button id="unlock-log-btn" type="button">Unlock Change Log (Password)</button>
-    <button id="unlock-qr-btn" type="button">Unlock Change Log (QR Code)</button>
-    <button id="clear-log-btn" type="button" disabled>Clear Change Log</button>
-    <span id="log-pass-error"></span>
+      <div id="equipment-info-rows">
+        <div class="row">
+          <label for="elf-0">ELF Completed</label>
+          <input type="checkbox" id="elf-0" name="elf[]" disabled />
+          <input type="text" name="elf_notes[]" placeholder="Notes" disabled />
+        </div>
+
+        <div class="row">
+          <label for="labels-0">Labels Installed by QCX: Phenolic / Arc Flash</label>
+          <input type="checkbox" id="labels-0" name="labels[]" disabled />
+          <input type="text" name="labels_notes[]" placeholder="Notes" disabled />
+        </div>
+      </div>
+
+      <button type="button" class="add-row-btn" data-section="equipment-info" disabled>+ Add Equipment Info Row</button>
+
+      <div class="signoff" id="signoff-equipment-info">
+        <label for="signoff-equipment-name">Sign-Off Name:</label>
+        <input type="text" id="signoff-equipment-name" name="signoff_equipment_name" placeholder="Name" disabled />
+        <label for="signoff-equipment-date">Date:</label>
+        <input type="date" id="signoff-equipment-date" name="signoff_equipment_date" disabled />
+      </div>
+
+      <!-- Equipment Mounted / Installation Specs Section -->
+      <div class="section-header" id="equipment-mounted-header">Equipment Mounted / Installation Specs</div>
+
+      <div id="equipment-mounted-rows">
+        <div class="row">
+          <label for="clearance-0">6” clearance from walls and panels</label>
+          <input type="checkbox" id="clearance-0" name="clearance[]" disabled />
+          <input type="text" name="clearance_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="coverbolts-0">Remove front cover bolts</label>
+          <input type="checkbox" id="coverbolts-0" name="coverbolts[]" disabled />
+          <input type="text" name="coverbolts_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="shipping-0">Shipping assembly (if required)</label>
+          <input type="checkbox" id="shipping-0" name="shipping[]" disabled />
+          <input type="text" name="shipping_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="protect-0">Apply protect cover to equipment</label>
+          <input type="checkbox" id="protect-0" name="protect[]" disabled />
+          <input type="text" name="protect_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="anchors-0">Anchored using 1/2” concrete wedge anchors</label>
+          <input type="checkbox" id="anchors-0" name="anchors[]" disabled />
+          <input type="text" name="anchors_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="square-0">Housing is mounted squared and leveled</label>
+          <input type="checkbox" id="square-0" name="square[]" disabled />
+          <input type="text" name="square_notes[]" placeholder="Notes" disabled />
+        </div>
+      </div>
+
+      <button type="button" class="add-row-btn" data-section="equipment-mounted" disabled>+ Add Installation Spec Row</button>
+
+      <div class="signoff" id="signoff-equipment-mounted">
+        <label for="signoff-mounted-name">Sign-Off Name:</label>
+        <input type="text" id="signoff-mounted-name" name="signoff_mounted_name" placeholder="Name" disabled />
+        <label for="signoff-mounted-date">Date:</label>
+        <input type="date" id="signoff-mounted-date" name="signoff_mounted_date" disabled />
+      </div>
+
+      <!-- Internal Wiring and Termination Specs Section -->
+      <div class="section-header" id="internal-wiring-header">Internal Wiring and Termination Specs</div>
+
+      <div id="internal-wiring-rows">
+        <div class="row">
+          <label for="lineLoad-0">Install proper line/load wiring from nearest panel</label>
+          <input type="checkbox" id="lineLoad-0" name="lineLoad[]" disabled />
+          <input type="text" name="lineLoad_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="primaryHV-0">Primary HV matches (L1-A, L2-B, L3-C)</label>
+          <input type="checkbox" id="primaryHV-0" name="primaryHV[]" disabled />
+          <input type="text" name="primaryHV_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="phaseRotation-0">Verify primary phase rotation</label>
+          <input type="checkbox" id="phaseRotation-0" name="phaseRotation[]" disabled />
+          <input type="text" name="phaseRotation_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="ground-0">Ground installation correct</label>
+          <input type="checkbox" id="ground-0" name="ground[]" disabled />
+          <input type="text" name="ground_notes[]" placeholder="Notes" disabled />
+        </div>
+      </div>
+
+      <button type="button" class="add-row-btn" data-section="internal-wiring" disabled>+ Add Internal Wiring Row</button>
+
+      <div class="signoff" id="signoff-internal-wiring">
+        <label for="signoff-wiring-name">Sign-Off Name:</label>
+        <input type="text" id="signoff-wiring-name" name="signoff_wiring_name" placeholder="Name" disabled />
+        <label for="signoff-wiring-date">Date:</label>
+        <input type="date" id="signoff-wiring-date" name="signoff_wiring_date" disabled />
+      </div>
+
+      <!-- Secondary Wiring Section -->
+      <div class="section-header" id="secondary-wiring-header">Secondary Wiring</div>
+
+      <div id="secondary-wiring-rows">
+        <div class="row">
+          <label for="secondaryWires-0">Secondary wires installed to labeling: X1-Black, X2-Red, X3-C, X4-Blue</label>
+          <input type="checkbox" id="secondaryWires-0" name="secondaryWires[]" disabled />
+          <input type="text" name="secondaryWires_notes[]" placeholder="Notes" disabled />
+        </div>
+      </div>
+
+      <button type="button" class="add-row-btn" data-section="secondary-wiring" disabled>+ Add Secondary Wiring Row</button>
+
+      <div class="signoff" id="signoff-secondary-wiring">
+        <label for="signoff-secondary-name">Sign-Off Name:</label>
+        <input type="text" id="signoff-secondary-name" name="signoff_secondary_name" placeholder="Name" disabled />
+        <label for="signoff-secondary-date">Date:</label>
+        <input type="date" id="signoff-secondary-date" name="signoff_secondary_date" disabled />
+      </div>
+
+      <!-- Final Checks Section -->
+      <div class="section-header" id="final-checks-header">Final Checks</div>
+
+      <div id="final-checks-rows">
+        <div class="row">
+          <label for="bondedBushing-0">Housing grounded via bonded bushing</label>
+          <input type="checkbox" id="bondedBushing-0" name="bondedBushing[]" disabled />
+          <input type="text" name="bondedBushing_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="bondingJumper-0">Bonding jumper meets code</label>
+          <input type="checkbox" id="bondingJumper-0" name="bondingJumper[]" disabled />
+          <input type="text" name="bondingJumper_notes[]" placeholder="Notes" disabled />
+        </div>
+        <div class="row">
+          <label for="notesAttached-0">Verify handwritten notes attached</label>
+          <input type="checkbox" id="notesAttached-0" name="notesAttached[]" disabled />
+          <input type="text" name="notesAttached_notes[]" placeholder="Notes" disabled />
+        </div>
+      </div>
+
+      <button type="button" class="add-row-btn" data-section="final-checks" disabled>+ Add Final Check Row</button>
+
+      <div class="signoff" id="signoff-final-checks">
+        <label for="signoff-final-name">Sign-Off Name:</label>
+        <input type="text" id="signoff-final-name" name="signoff_final_name" placeholder="Name" disabled />
+        <label for="signoff-final-date">Date:</label>
+        <input type="date" id="signoff-final-date" name="signoff_final_date" disabled />
+      </div>
+
+      <!-- QCX Review Section (non-repeatable) -->
+      <div class="section-header" id="qcx-review-header">QCX Review</div>
+
+      <div class="row">
+        <label for="qcxName">Name</label>
+        <input type="text" id="qcxName" name="qcxName" disabled />
+        <div></div>
+      </div>
+
+      <div class="row">
+        <label for="qcxDate">Date</label>
+        <input type="date" id="qcxDate" name="qcxDate" disabled />
+        <div></div>
+      </div>
+
+      <div class="submit-container">
+        <button type="submit" disabled>SUBMIT CHECK SHEET</button>
+      </div>
+
+    </form>
+
+  </div> <!-- container -->
+
+  <div id="change-tracker-sidebar">
+    <h3>Change Tracker (read-only)</h3>
+    <div id="change-log">(No changes recorded)</div>
+    <button id="unlock-log-btn">Unlock Change Log</button>
+    <button id="clear-log-btn" disabled>Clear Change Log</button>
+    <div id="log-pass-error"></div>
   </div>
 
-  <!-- QR Scanner Container -->
-  <div id="qr-scanner-container">
-    <video id="qr-video"></video>
-    <button id="stop-qr-btn" type="button" style="margin-top:0.5rem;">Stop Scanner</button>
-  </div>
+</div> <!-- main-wrapper -->
 
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-  <script>
-    // === Rolling Change Tracker ===
-    const changeLogDiv = document.getElementById('change-log');
-    const unlockLogBtn = document.getElementById('unlock-log-btn');
-    const unlockQRBtn = document.getElementById('unlock-qr-btn');
-    const clearLogBtn = document.getElementById('clear-log-btn');
-    const passErrorDiv = document.getElementById('log-pass-error');
+<!-- Html5Qrcode library -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    let changeLog = [];
+<script>
+  // === Rolling Change Tracker ===
 
-    function loadChangeLog() {
-      const saved = localStorage.getItem('constructionChangeLog');
-      if (saved) {
-        try {
-          changeLog = JSON.parse(saved);
-        } catch {
-          changeLog = [];
-        }
-        renderChangeLog();
+  const changeLogDiv = document.getElementById('change-log');
+  const unlockLogBtn = document.getElementById('unlock-log-btn');
+  const clearLogBtn = document.getElementById('clear-log-btn');
+  const passErrorDiv = document.getElementById('log-pass-error');
+
+  let changeLog = [];
+
+  function loadChangeLog() {
+    const saved = localStorage.getItem('constructionChangeLog');
+    if (saved) {
+      try {
+        changeLog = JSON.parse(saved);
+      } catch {
+        changeLog = [];
       }
+      renderChangeLog();
     }
+  }
 
-    function saveChangeLog() {
-      localStorage.setItem('constructionChangeLog', JSON.stringify(changeLog));
+  function saveChangeLog() {
+    localStorage.setItem('constructionChangeLog', JSON.stringify(changeLog));
+  }
+
+  function renderChangeLog() {
+    if (changeLog.length === 0) {
+      changeLogDiv.textContent = '(No changes recorded)';
+    } else {
+      changeLogDiv.textContent = changeLog.join('\n');
+      changeLogDiv.scrollTop = changeLogDiv.scrollHeight;
     }
+  }
 
-    function renderChangeLog() {
-      if (changeLog.length === 0) {
-        changeLogDiv.textContent = '(No changes recorded)';
-      } else {
-        changeLogDiv.textContent = changeLog.join('\n');
-        changeLogDiv.scrollTop = changeLogDiv.scrollHeight;
-      }
+  function logChange(field, oldVal, newVal) {
+    if (oldVal === newVal) return; // ignore no change
+    const now = new Date().toLocaleString();
+    const entry = `[${now}] ${field}: "${oldVal}" → "${newVal}"`;
+    changeLog.push(entry);
+    saveChangeLog();
+    renderChangeLog();
+  }
+
+  unlockLogBtn.addEventListener('click', () => {
+    const pass = prompt('Enter password to unlock the change log:');
+    if (pass === 'unlocklog123') {
+      changeLogDiv.contentEditable = "true";
+      changeLogDiv.style.backgroundColor = '#ffffe0';
+      clearLogBtn.disabled = false;
+      passErrorDiv.textContent = '';
+    } else {
+      passErrorDiv.textContent = 'Incorrect password!';
     }
+  });
 
-    function logChange(field, oldVal, newVal) {
-      if (oldVal === newVal) return;
-      const now = new Date().toLocaleString();
-      const entry = `[${now}] ${field}: "${oldVal}" → "${newVal}"`;
-      changeLog.push(entry);
+  clearLogBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear the change log?')) {
+      changeLog = [];
       saveChangeLog();
       renderChangeLog();
     }
+  });
 
-    unlockLogBtn.addEventListener('click', () => {
-      const pass = prompt('Enter password to unlock the change log:');
-      if (pass === '18436572') {
-        unlockChangeLogEditing();
-        passErrorDiv.textContent = '';
-      } else {
-        passErrorDiv.textContent = 'Incorrect password!';
-      }
+  loadChangeLog();
+
+  // === Form Unlock via QR code ===
+
+  const lockOverlay = document.getElementById('lock-overlay');
+  const qrReaderDiv = document.getElementById('qr-reader');
+  const mainForm = document.getElementById('main-form');
+
+  let scannerActive = false;
+  let qrScanner = null;
+
+  // Disable all inputs and buttons initially
+  function setFormDisabled(disabled) {
+    const inputs = mainForm.querySelectorAll('input, button');
+    inputs.forEach(input => {
+      if (input.id === 'unlock-log-btn' || input.id === 'clear-log-btn') return;
+      input.disabled = disabled;
     });
 
-    clearLogBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear the change log?')) {
-        changeLog = [];
-        saveChangeLog();
-        renderChangeLog();
-      }
+    // Disable Add Row buttons
+    const addButtons = mainForm.querySelectorAll('.add-row-btn');
+    addButtons.forEach(btn => {
+      btn.disabled = disabled;
     });
+  }
 
-    function unlockChangeLogEditing() {
-      changeLogDiv.contentEditable = "true";
-      changeLogDiv.style.backgroundColor = '#fffbe6';
-      clearLogBtn.disabled = false;
-      unlockLogBtn.disabled = true;
-      unlockQRBtn.disabled = true;
-      stopQRScanner(); // in case it's running
+  setFormDisabled(true);
+
+  // Unlock form and stop scanner
+  function unlockForm() {
+    setFormDisabled(false);
+    lockOverlay.style.display = 'none';
+    qrReaderDiv.style.display = 'none';
+
+    if (qrScanner) {
+      qrScanner.stop().then(() => {
+        console.log("QR Scanner stopped.");
+      }).catch(e => {
+        console.warn("Failed to stop scanner:", e);
+      });
     }
 
-    // === Dynamic form handling ===
-    const mainForm = document.getElementById('main-form');
+    scannerActive = false;
+  }
 
-    const dynamicSections = {
-      'equipment-info': 'elf',
-      'equipment-mounted': 'clearance',
-      'internal-wiring': 'lineLoad',
-      'secondary-wiring': 'secondaryWires',
-      'final-checks': 'bondedBushing'
-    };
+  // Start the scanner with fallback logic for camera facingMode
+  function startScanner() {
+    if (scannerActive) return;
+    scannerActive = true;
 
-    // Save form including dynamic rows
-    function saveFormData() {
-      const formData = {};
+    qrScanner = new Html5Qrcode("qr-reader");
 
-      const allInputs = mainForm.querySelectorAll('input, textarea');
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-      // Collect all dynamic container inputs to exclude from static save
-      const dynamicContainers = Object.keys(dynamicSections).map(
-        section => document.getElementById(dynamicSections[section] + '-rows')
-      ).filter(Boolean);
+    // Try environment camera first
+    qrScanner.start(
+      { facingMode: "environment" },
+      config,
+      qrCodeMessage => {
+        const code = qrCodeMessage.trim();
+        console.log("QR code scanned:", code);
+        logChange('QR Scan Attempt', '(no old value)', code);
 
-      const dynamicInputs = new Set();
-
-      dynamicContainers.forEach(container => {
-        container.querySelectorAll('input, textarea').forEach(input => {
-          dynamicInputs.add(input);
-        });
-      });
-
-      allInputs.forEach(input => {
-        if (dynamicInputs.has(input)) return;
-
-        const key = input.name + (input.id ? `|${input.id}` : '');
-        if (input.type === 'checkbox') {
-          formData[key] = input.checked;
+        if (/^\d{7}$/.test(code)) {
+          console.log("Valid unlock code detected.");
+          logChange('Form Unlock', '(locked)', `Unlocked with code: ${code}`);
+          unlockForm();
         } else {
-          formData[key] = input.value;
+          console.log("Invalid code, ignoring.");
+          logChange('Form Unlock Attempt Failed', '(locked)', `Attempted with code: ${code}`);
         }
-      });
-
-      formData.dynamicRows = {};
-
-      for (const [section, base] of Object.entries(dynamicSections)) {
-        const container = document.getElementById(base + '-rows');
-        if (!container) continue;
-
-        const rows = container.querySelectorAll('.row');
-        formData.dynamicRows[section] = [];
-
-        rows.forEach(row => {
-          const checkbox = row.querySelector(`input[type="checkbox"][name^="${base}"]`);
-          const notes = row.querySelector(`input[type="text"][name^="${base}_notes"]`);
-
-          formData.dynamicRows[section].push({
-            checked: checkbox ? checkbox.checked : false,
-            notes: notes ? notes.value : ''
-          });
-        });
+      },
+      errorMessage => {
+        // Uncomment for debugging scan errors:
+        // console.log("QR scan error:", errorMessage);
       }
+    ).then(() => {
+      console.log("QR Scanner started with environment camera.");
+    }).catch(err => {
+      console.warn("Failed environment camera start:", err);
+      // fallback to user camera
+      qrScanner.start(
+        { facingMode: "user" },
+        config,
+        qrCodeMessage => {
+          const code = qrCodeMessage.trim();
+          console.log("QR code scanned:", code);
+          logChange('QR Scan Attempt', '(no old value)', code);
 
-      localStorage.setItem('constructionFormData', JSON.stringify(formData));
-    }
-
-    function clearDynamicRows(section) {
-      const base = dynamicSections[section];
-      const container = document.getElementById(base + '-rows');
-      if (!container) return;
-      container.innerHTML = '';
-    }
-
-    function addDynamicRow(section, checked = false, notes = '') {
-      const base = dynamicSections[section];
-      const container = document.getElementById(base + '-rows');
-      if (!container) return;
-
-      const index = container.querySelectorAll('.row').length;
-
-      const newRow = document.createElement('div');
-      newRow.className = 'row';
-
-      const label = document.createElement('label');
-      label.setAttribute('for', `${base}-${index}`);
-      label.textContent = `${capitalizeWords(base)} item ${index + 1}`;
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = `${base}-${index}`;
-      checkbox.name = `${base}[]`;
-      checkbox.checked = checked;
-
-      const notesInput = document.createElement('input');
-      notesInput.type = 'text';
-      notesInput.name = `${base}_notes[]`;
-      notesInput.placeholder = 'Notes';
-      notesInput.value = notes;
-
-      newRow.appendChild(label);
-      newRow.appendChild(checkbox);
-      newRow.appendChild(notesInput);
-      container.appendChild(newRow);
-
-      lastValues.set(checkbox, checkbox.checked);
-      lastValues.set(notesInput, notesInput.value);
-
-      checkbox.addEventListener('change', () => {
-        const oldVal = lastValues.get(checkbox);
-        const newVal = checkbox.checked;
-        if (oldVal !== newVal) {
-          const fieldName = label.textContent + ' (checked)';
-          logChange(fieldName, oldVal, newVal);
-          lastValues.set(checkbox, newVal);
-          saveFormData();
-        }
-      });
-
-      notesInput.addEventListener('change', () => {
-        const oldVal = lastValues.get(notesInput);
-        const newVal = notesInput.value;
-        if (oldVal !== newVal) {
-          const fieldName = label.textContent + ' (notes)';
-          logChange(fieldName, oldVal, newVal);
-          lastValues.set(notesInput, newVal);
-          saveFormData();
-        }
-      });
-    }
-
-    function loadFormData() {
-      const savedData = localStorage.getItem('constructionFormData');
-      if (!savedData) return;
-
-      let formData;
-      try {
-        formData = JSON.parse(savedData);
-      } catch {
-        return;
-      }
-
-      const allInputs = mainForm.querySelectorAll('input, textarea');
-
-      allInputs.forEach(input => {
-        const key = input.name + (input.id ? `|${input.id}` : '');
-
-        // Skip dynamic row inputs, handled separately
-        if (formData.dynamicRows) {
-          for (const section of Object.keys(dynamicSections)) {
-            const base = dynamicSections[section];
-            if (key.startsWith(base)) {
-              return;
-            }
+          if (/^\d{7}$/.test(code)) {
+            console.log("Valid unlock code detected.");
+            logChange('Form Unlock', '(locked)', `Unlocked with code: ${code}`);
+            unlockForm();
+          } else {
+            console.log("Invalid code, ignoring.");
+            logChange('Form Unlock Attempt Failed', '(locked)', `Attempted with code: ${code}`);
           }
+        },
+        errorMessage => {
+          // console.log("QR scan error:", errorMessage);
         }
-
-        if (!(key in formData)) return;
-
-        if (input.type === 'checkbox') {
-          input.checked = formData[key];
-        } else {
-          input.value = formData[key];
-        }
-
-        lastValues.set(input, getInputValue(input));
-      });
-
-      if (formData.dynamicRows) {
-        for (const [section, rows] of Object.entries(formData.dynamicRows)) {
-          clearDynamicRows(section);
-          rows.forEach(rowData => {
-            addDynamicRow(section, rowData.checked, rowData.notes);
-          });
-        }
-      }
-    }
-
-    function getInputValue(input) {
-      if (input.type === 'checkbox') return input.checked;
-      return input.value;
-    }
-
-    const lastValues = new Map();
-
-    window.addEventListener('load', () => {
-      loadFormData();
-
-      const staticInputs = mainForm.querySelectorAll('input, textarea');
-
-      staticInputs.forEach(input => {
-        lastValues.set(input, getInputValue(input));
-        input.addEventListener('change', () => {
-          const oldVal = lastValues.get(input);
-          const newVal = getInputValue(input);
-          if (oldVal !== newVal) {
-            const label = mainForm.querySelector(`label[for="${input.id}"]`);
-            const fieldName = label ? label.textContent.trim() : input.name || input.id;
-            logChange(fieldName, oldVal, newVal);
-            lastValues.set(input, newVal);
-            saveFormData();
-          }
-        });
+      ).then(() => {
+        console.log("QR Scanner started with user camera.");
+      }).catch(err => {
+        console.error("Failed user camera start:", err);
+        scannerActive = false;
+        alert('Failed to start camera for QR scanning. Please check camera permissions.');
       });
     });
+  }
 
-    const addRowButtons = document.querySelectorAll('.add-row-btn');
-    addRowButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        const section = btn.getAttribute('data-section');
-        addDynamicRow(section, false, '');
-        saveFormData();
-      });
-    });
+  // Start scanner on page load
+  window.addEventListener('load', () => {
+    startScanner();
+  });
 
-    function capitalizeWords(str) {
-      return str.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-    }
+  // === Track form changes to log them ===
 
-    // === QR code scanner unlock ===
+  // Utility: get string value for input element
+  function getInputValue(input) {
+    if (input.type === 'checkbox') return input.checked;
+    return input.value;
+  }
 
-    const qrScannerContainer = document.getElementById('qr-scanner-container');
-    const qrVideo = document.getElementById('qr-video');
-    const stopQRBtn = document.getElementById('stop-qr-btn');
-    let videoStream = null;
-    let qrScanInterval = null;
+  // Store initial values to compare changes
+  const formElements = mainForm.querySelectorAll('input, textarea');
+  const lastValues = new Map();
 
-    unlockQRBtn.addEventListener('click', () => {
-      startQRScanner();
-    });
+  formElements.forEach(el => {
+    lastValues.set(el, getInputValue(el));
 
-    stopQRBtn.addEventListener('click', () => {
-      stopQRScanner();
-    });
+    el.addEventListener('change', () => {
+      const oldVal = lastValues.get(el);
+      const newVal = getInputValue(el);
 
-    function startQRScanner() {
-      passErrorDiv.textContent = '';
-      if (qrScannerContainer.style.display === 'block') return; // already running
-      qrScannerContainer.style.display = 'block';
-
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(stream => {
-          videoStream = stream;
-          qrVideo.srcObject = stream;
-          qrVideo.setAttribute('playsinline', true); // for iOS safari
-          qrVideo.play();
-
-          qrScanInterval = setInterval(scanQRCode, 300);
-        })
-        .catch(err => {
-          passErrorDiv.textContent = 'Camera access denied or not available.';
-          stopQRScanner();
-        });
-    }
-
-    function stopQRScanner() {
-      if (qrScanInterval) {
-        clearInterval(qrScanInterval);
-        qrScanInterval = null;
+      if (oldVal !== newVal) {
+        const label = mainForm.querySelector(`label[for="${el.id}"]`);
+        const fieldName = label ? label.textContent.trim() : el.name || el.id;
+        logChange(fieldName, oldVal, newVal);
+        lastValues.set(el, newVal);
       }
-      if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-        videoStream = null;
-      }
-      qrScannerContainer.style.display = 'none';
-      qrVideo.pause();
-      qrVideo.srcObject = null;
-    }
+    });
+  });
 
-    function scanQRCode() {
-      if (qrVideo.readyState !== qrVideo.HAVE_ENOUGH_DATA) {
+  // === Add row button logic ===
+
+  function addRow(section) {
+    const containerId = {
+      'equipment-info': 'equipment-info-rows',
+      'equipment-mounted': 'equipment-mounted-rows',
+      'internal-wiring': 'internal-wiring-rows',
+      'secondary-wiring': 'secondary-wiring-rows',
+      'final-checks': 'final-checks-rows',
+    }[section];
+
+    if (!containerId) return;
+
+    const container = document.getElementById(containerId);
+
+    // Find current count of rows in section
+    const rows = container.querySelectorAll('.row');
+    const index = rows.length;
+
+    // Template for new row (checkbox + notes)
+    const newRow = document.createElement('div');
+    newRow.className = 'row';
+
+    // We need to create label, checkbox, and notes input with proper ids and names
+    // For label's for attribute and input ids, use `${name}-${index}`
+    // For names, e.g. name="elf[]" or name="elf_notes[]" depending on section
+
+    let fieldBase = '';
+    switch (section) {
+      case 'equipment-info':
+        // Two fields per row: elf and labels? The original code had two rows. Here just create one row with one checkbox and one notes input?
+        // For simplicity, add a single checkbox with name="elf[]" and notes "elf_notes[]"
+        fieldBase = 'elf';
+        break;
+      case 'equipment-mounted':
+        fieldBase = 'clearance'; // you can customize this if needed
+        break;
+      case 'internal-wiring':
+        fieldBase = 'lineLoad';
+        break;
+      case 'secondary-wiring':
+        fieldBase = 'secondaryWires';
+        break;
+      case 'final-checks':
+        fieldBase = 'bondedBushing';
+        break;
+      default:
         return;
-      }
-
-      const canvas = document.createElement('canvas');
-      canvas.width = qrVideo.videoWidth;
-      canvas.height = qrVideo.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(qrVideo, 0, 0, canvas.width, canvas.height);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-      if (code) {
-        if (code.data === '18436572') { // password encoded in QR code
-          unlockChangeLogEditing();
-          passErrorDiv.textContent = '';
-          stopQRScanner();
-        } else {
-          passErrorDiv.textContent = 'Invalid QR code.';
-        }
-      }
     }
 
-  </script>
+    // Create label
+    const label = document.createElement('label');
+    label.setAttribute('for', `${fieldBase}-${index}`);
+    label.textContent = `New ${fieldBase} item ${index + 1}`;
+
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `${fieldBase}-${index}`;
+    checkbox.name = `${fieldBase}[]`;
+    checkbox.disabled = false;
+
+    // Notes input
+    const notesInput = document.createElement('input');
+    notesInput.type = 'text';
+    notesInput.name = `${fieldBase}_notes[]`;
+    notesInput.placeholder = 'Notes';
+    notesInput.disabled = false;
+
+    newRow.appendChild(label);
+    newRow.appendChild(checkbox);
+    newRow.appendChild(notesInput);
+
+    container.appendChild(newRow);
+
+    // Add change event listeners for logging on these new inputs
+    [checkbox, notesInput].forEach(el => {
+      lastValues.set(el, getInputValue(el));
+      el.addEventListener('change', () => {
+        const oldVal = lastValues.get(el);
+        const newVal = getInputValue(el);
+
+        if (oldVal !== newVal) {
+          const fieldName = label.textContent.trim() + (el.type === 'checkbox' ? ' (checked)' : ' (notes)');
+          logChange(fieldName, oldVal, newVal);
+          lastValues.set(el, newVal);
+        }
+      });
+    });
+  }
+
+  // Attach event listeners to all add-row buttons
+  const addRowButtons = document.querySelectorAll('.add-row-btn');
+  addRowButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const section = btn.getAttribute('data-section');
+      addRow(section);
+    });
+  });
+
+</script>
 
 </body>
 </html>
