@@ -478,13 +478,13 @@
 
   unlockLogBtn.addEventListener('click', () => {
     const pass = prompt('Enter password to unlock the change log:');
-    if (pass === 'unlocklog123') {
+    if (pass === '18436572') {
       changeLogDiv.contentEditable = "true";
       changeLogDiv.style.backgroundColor = '#ffffe0';
       clearLogBtn.disabled = false;
       passErrorDiv.textContent = '';
     } else {
-      passErrorDiv.textContent = 'Incorrect password!';
+      passErrorDiv.textContent = 'Access Denied';
     }
   });
 
