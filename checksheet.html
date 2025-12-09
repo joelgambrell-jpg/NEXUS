@@ -35,9 +35,9 @@
 <!-- QR AUTH LOCK SCREEN -->
 <div id="lockscreen" class="locked-overlay">
   <div id="qr-area">
-    <h3>Please scan your badge</h3>
+    <h3>Scan QR Code to Unlock</h3>
     <video id="qr-video" autoplay playsinline></video>
-    <p id="qr-status">Please scan your badge</p>
+    <p id="qr-status">Waiting for scan...</p>
     <div style="margin-top:12px;"><button id="cancelScan" class="ghost">Cancel</button></div>
   </div>
 </div>
@@ -100,7 +100,7 @@ const forceSyncBtn = document.getElementById('forceSync');
 
 // -------- QR SCAN (BarcodeDetector preferred, fallback to jsQR) ----------
 async function startQRScan() {
-  qrStatus.textContent = 'Please scan your badge';
+  qrStatus.textContent = 'Requesting camera...';
   try {
     qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     qrVideo.srcObject = qrStream;
@@ -173,12 +173,23 @@ cancelScanBtn.addEventListener('click', () => {
   // keep sheet locked; user must reopen to scan again
 });
 
+function playNexusVoice() {
+  const utterance = new SpeechSynthesisUtterance('Nexus');
+  const voices = speechSynthesis.getVoices();
+  // Try to find a male English voice, fallback to first voice
+  utterance.voice = voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('female')) || voices[0];
+  utterance.rate = 0.8;  // slower, dramatic
+  utterance.pitch = 0.6; // lower pitch
+  speechSynthesis.speak(utterance);
+}
+
 function unlockEditing() {
   editingUnlocked = true;
   stopQRScan();
   lockscreen.style.display = 'none';
   sheetContainer.classList.remove('disabled');
   qrStatus.textContent = 'Unlocked';
+  playNexusVoice();
   restoreLocal();
 }
 
