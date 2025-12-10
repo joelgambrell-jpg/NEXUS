@@ -33,7 +33,8 @@
     opacity: 0.15;
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, display 0.3s ease;
+    display: block;
   }
 
   .page-wrap {
@@ -95,12 +96,15 @@
     transition: all 0.2s ease;
   }
 
-  .btn:hover {
+  .btn:hover,
+  .btn:focus {
     background: var(--btn-hover-bg);
     color: var(--btn-hover-color);
     transform: translateY(-2px);
+    outline: none;
   }
 
+  /* Show tooltip on btn-wrapper hover or focus-within, and also on btn focus */
   .btn-wrapper .tooltip {
     visibility: hidden;
     opacity: 0;
@@ -117,6 +121,7 @@
     font-size: 13px;
     width: max-content;
     max-width: 200px;
+    pointer-events: none;
   }
 
   .btn-wrapper .tooltip::after {
@@ -131,7 +136,8 @@
   }
 
   .btn-wrapper:hover .tooltip,
-  .btn-wrapper:focus-within .tooltip {
+  .btn-wrapper:focus-within .tooltip,
+  .btn:focus + .tooltip {
     visibility: visible;
     opacity: 1;
   }
@@ -157,60 +163,71 @@
     border-radius: 8px;
     cursor: pointer;
   }
+
+  /* Special large green button */
+  .btn-special {
+    background: #39ff14;
+    color: #000;
+    border: 2px solid #39ff14;
+    font-size: 20px;
+    padding: 20px 32px;
+    border-radius: 14px;
+    font-weight: 800;
+  }
+
 </style>
 </head>
 <body>
 
-<img id="backgroundDiagram" class="background-image" src="transformer.jpg" />
+<img id="backgroundDiagram" class="background-image" src="transformer.jpg" alt="Transformer Diagram" />
 
 <div class="page-wrap">
   <main class="container">
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="toggle-btn" onclick="toggleBackground()">Show/Hide Transformer Diagram</button>
+    <button class="toggle-btn" id="toggleBtn" aria-pressed="false" onclick="toggleBackground()">Show/Hide Transformer Diagram</button>
 
     <section class="grid">
       <div class="btn-wrapper">
-        <a class="btn" href="transformer.html" target="_blank">ℹ️ Transformer Image</a>
+        <a class="btn" href="transformer.html" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
         <span class="tooltip">View the transformer image</span>
       </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="phenolic.html" target="_blank">ℹ️ Phenolic Display</a>
+        <a class="btn" href="phenolic.html" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
         <span class="tooltip">View the Phenolic Display document</span>
       </div> 
       
       <div class="btn-wrapper">
-        <a class="btn" href="1index.html" target="_blank">ℹ️ G-doc Test</a>
+        <a class="btn" href="1index.html" target="_blank" rel="noopener noreferrer">ℹ️ G-doc Test</a>
         <span class="tooltip">G-doc Test</span>
       </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="lvt.html" target="_blank">ℹ️ LVT L2 IVF</a>
+        <a class="btn" href="lvt.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
         <span class="tooltip">View the LVT L2 IVF report</span>
       </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="supporting.html" target="_blank">ℹ️ Supporting Documents</a>
+        <a class="btn" href="supporting.html" target="_blank" rel="noopener noreferrer">ℹ️ Supporting Documents</a>
         <span class="tooltip">View supporting documents</span>
       </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="prefod.html" target="_blank">ℹ️ Pre-FOD Link</a>
+        <a class="btn" href="prefod.html" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD Link</a>
         <span class="tooltip">Access the Pre-FOD link</span>
       </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank">ℹ️ Megohmmeter Reporting</a>
+        <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
         <span class="tooltip">Megohmmeter Reporting</span>
       </div>
-
     </section>
 
-      <div style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 20px;">
-        <a class="btn" href="checksheet.html" target="_blank" style="background:#39ff14; color:#000; border:2px solid #39ff14; font-size:20px; padding:20px 32px; border-radius:14px; font-weight:800;">Construction Check Sheet</a>
-      </div>
+    <div style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 20px;">
+      <a class="btn btn-special" href="checksheet.html" target="_blank" rel="noopener noreferrer">Construction Check Sheet</a>
+    </div>
 
   </main>
 </div>
@@ -220,7 +237,14 @@
 <script>
 function toggleBackground() {
   const bg = document.getElementById('backgroundDiagram');
-  bg.style.opacity = (bg.style.opacity == 0.15 ? 1 : 0.15);
+  const btn = document.getElementById('toggleBtn');
+  if (bg.style.display === 'none' || bg.style.display === '') {
+    bg.style.display = 'block';
+    btn.setAttribute('aria-pressed', 'false');
+  } else {
+    bg.style.display = 'none';
+    btn.setAttribute('aria-pressed', 'true');
+  }
 }
 </script>
 
