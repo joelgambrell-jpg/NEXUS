@@ -220,7 +220,7 @@
       <h2>Construction Check-sheet</h2>
 
       <div id="qr-reader"></div>
-      <div id="lock-overlay">Scan QR code on badge to access the form.</div>
+      <div id="lock-overlay">Scan 7-digit unlock QR code to unlock the form</div>
 
       <div class="row">
         <label for="building">Building Number</label>
@@ -429,6 +429,10 @@
 
 </div> <!-- main-wrapper -->
 
+<!-- Html5Qrcode library -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script>
   // === Rolling Change Tracker ===
 
   const changeLogDiv = document.getElementById('change-log');
@@ -738,15 +742,6 @@
   });
 
 </script>
-</div>
-
-<footer class="footer">© Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.</footer>
-
-<script>
-function toggleBackground() {
-  const bg = document.getElementById('backgroundDiagram');
-  bg.style.opacity = (bg.style.opacity == 0.15 ? 1 : 0.15);
-}
 
 </body>
 </html>
