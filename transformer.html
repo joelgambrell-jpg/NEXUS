@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Transformer</title>
 <style>
   body {
@@ -72,16 +72,16 @@
     text-align: center;
   }
 
-  /* Magnifier Lens - doubled size */
+  /* Magnifier Lens */
   .img-magnifier-glass {
     position: absolute;
     border: 3px solid #fff;
     border-radius: 50%;
     cursor: none;
-    width: 450px;  /* doubled from 120 */
-    height: 450px; /* doubled from 120 */
+    width: 450px;
+    height: 450px;
     box-shadow: 0 0 8px #fff;
-    display: none; /* hidden initially */
+    display: none;
   }
 </style>
 </head>
@@ -103,39 +103,35 @@
 <div id="imgModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" title="Close">&times;</span>
-    <img id="modalImg" src="transformer.jpg" alt="Transformer Image">
+    <img id="modalImg" src="transformer.jpg" alt="Transformer Image" />
     <div class="img-magnifier-glass" id="magnifier"></div>
   </div>
 </div>
 
 <script>
-  // Modal elements
   const modal = document.getElementById('imgModal');
   const closeBtn = document.querySelector('.close-btn');
   const img = document.getElementById('modalImg');
   const magnifier = document.getElementById('magnifier');
 
-  // Open modal on page load
+  // Open modal on page load with zoom 4
   window.onload = function() {
     modal.style.display = 'flex';
-    magnify(img, 3); // magnification zoom level
-  }
+    magnify(img, 4);
+  };
 
-  // Close modal on close button click
   closeBtn.onclick = function() {
     modal.style.display = 'none';
     removeMagnifier();
-  }
+  };
 
-  // Close modal if clicking outside the image
   modal.onclick = function(e) {
     if (e.target === modal) {
       modal.style.display = 'none';
       removeMagnifier();
     }
-  }
+  };
 
-  // Magnifier function
   function magnify(img, zoom) {
     let glass = magnifier;
     let w, h, bw;
@@ -144,8 +140,8 @@
     glass.style.backgroundRepeat = 'no-repeat';
     glass.style.backgroundSize = (img.width * zoom) + 'px ' + (img.height * zoom) + 'px';
     bw = 6;
-    w = glass.offsetWidth / 0;
-    h = glass.offsetHeight / 0;
+    w = glass.offsetWidth / 2;
+    h = glass.offsetHeight / 2;
 
     glass.style.display = 'block';
 
@@ -179,11 +175,9 @@
     glass.addEventListener("mousemove", moveMagnifier);
     img.addEventListener("touchmove", moveMagnifier);
 
-    // Save reference for removing event listeners
     glass._moveMagnifier = moveMagnifier;
   }
 
-  // Remove magnifier event listeners and hide lens
   function removeMagnifier() {
     magnifier.style.display = 'none';
     img.removeEventListener("mousemove", magnifier._moveMagnifier);
@@ -191,6 +185,5 @@
     img.removeEventListener("touchmove", magnifier._moveMagnifier);
   }
 </script>
-
 </body>
 </html>
