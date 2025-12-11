@@ -8,7 +8,7 @@
 <style>
   :root {
     --bg: #b60000;
-    --panel: rgba(255, 255, 255, 0.18);
+    --panel: rgba(255, 255, 255, 0.25);
     --btn-bg: #ffffffdd;
     --btn-color: #000;
     --btn-hover-bg: #fff;
@@ -24,15 +24,14 @@
     background: var(--bg);
   }
 
-  /* More visible background */
   .background-image {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    opacity: 0.28;
+    object-fit: contain;
+    opacity: 1; /* Fully visible */
     pointer-events: none;
     z-index: 0;
     transition: opacity 0.3s ease;
@@ -69,39 +68,44 @@
     margin: 0 auto 18px auto;
   }
 
-  /* More even button spacing */
+  /* Updated grid for even buttons */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 22px;
-    margin-top: 12px;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    gap: 16px;
+    margin-top: 8px;
   }
 
+  /* Make each button fill its grid cell */
   .btn-wrapper {
     position: relative;
-    display: flex;
-    justify-content: center;
   }
 
-  /* Uniform button size */
-  .btn {
-    display: inline-flex;
+  .btn-wrapper .btn {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 60px; /* consistent height */
+    box-sizing: border-box;
+  }
+
+  /* NEON RED BUTTON GLOW */
+  .btn {
     gap: 6px;
     background: var(--btn-bg);
     color: var(--btn-color);
-    padding: 16px 18px;
+    padding: 14px 16px;
     border-radius: 12px;
-    min-height: 60px;
-    width: 100%;
-    justify-content: center;
     text-decoration: none;
     font-size: 15px;
     font-weight: 700;
     border: 2px solid #ff0000;
-    box-shadow: 0 0 12px #ff0000;
+    cursor: pointer;
+    text-align: center;
     transition: all 0.2s ease;
-    box-sizing: border-box;
+    box-shadow: 0 0 12px #ff0000;
+    user-select: none;
   }
 
   .btn:hover,
@@ -169,18 +173,21 @@
     padding: 10px 14px;
     border: none;
     border-radius: 8px;
-    cursor: pointer;
+    cursor: default; /* Disable pointer for toggle as it’s off */
   }
 
   .btn-special {
     background: #39ff14;
     color: #000;
-    border: 2px solid #ff0000;
+    border: 2px solid #39ff14;
     font-size: 20px;
     padding: 20px 32px;
     border-radius: 14px;
     font-weight: 800;
+
+    /* red glow override */
     box-shadow: 0 0 14px #ff0000;
+    border-color: #ff0000;
   }
 
   #debugLog {
@@ -200,8 +207,8 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="toggle-btn" id="toggleBtn" aria-pressed="true" onclick="toggleBackground()">
-      Show/Hide Transformer Diagram
+    <button class="toggle-btn" id="toggleBtn" aria-pressed="true" disabled>
+      Transformer Diagram Always Visible
     </button>
 
     <section class="grid">
@@ -236,6 +243,7 @@
         <span class="tooltip">Megohmmeter Reporting</span>
       </div>
 
+      <!-- NEW TORQUE APPLICATION BUTTON -->
       <div class="btn-wrapper">
         <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
         <span class="tooltip">View the Torque Application document</span>
@@ -256,17 +264,7 @@
 </footer>
 
 <script>
-  function toggleBackground() {
-    const bg = document.getElementById('backgroundDiagram');
-    const btn = document.getElementById('toggleBtn');
-    if (bg.style.opacity === '0') {
-      bg.style.opacity = '0.28';
-      btn.setAttribute('aria-pressed', 'true');
-    } else {
-      bg.style.opacity = '0';
-      btn.setAttribute('aria-pressed', 'false');
-    }
-  }
+  // Remove toggleBackground function - no toggle anymore
 
   document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', e => {
@@ -277,12 +275,8 @@
   });
 
   window.addEventListener('load', () => {
-    const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
-    if (!bg.style.opacity) {
-      bg.style.opacity = '0.28';
-    }
-    btn.setAttribute('aria-pressed', bg.style.opacity !== '0' ? 'true' : 'false');
+    btn.setAttribute('aria-pressed', 'true');
   });
 </script>
 
