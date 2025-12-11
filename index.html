@@ -8,7 +8,7 @@
 <style>
   :root {
     --bg: #b60000;
-    --panel: rgba(255, 255, 255, 0.25);
+    --panel: rgba(255, 255, 255, 0.18);
     --btn-bg: #ffffffdd;
     --btn-color: #000;
     --btn-hover-bg: #fff;
@@ -24,14 +24,15 @@
     background: var(--bg);
   }
 
+  /* More visible background */
   .background-image {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    opacity: 0.15;
+    object-fit: cover;
+    opacity: 0.28;
     pointer-events: none;
     z-index: 0;
     transition: opacity 0.3s ease;
@@ -68,35 +69,39 @@
     margin: 0 auto 18px auto;
   }
 
+  /* More even button spacing */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-    margin-top: 8px;
+    gap: 22px;
+    margin-top: 12px;
   }
 
   .btn-wrapper {
     position: relative;
+    display: flex;
+    justify-content: center;
   }
 
-  /* NEON RED BUTTON GLOW */
+  /* Uniform button size */
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     background: var(--btn-bg);
     color: var(--btn-color);
-    padding: 14px 16px;
+    padding: 16px 18px;
     border-radius: 12px;
+    min-height: 60px;
+    width: 100%;
+    justify-content: center;
     text-decoration: none;
     font-size: 15px;
     font-weight: 700;
     border: 2px solid #ff0000;
-    box-sizing: border-box;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s ease;
     box-shadow: 0 0 12px #ff0000;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
   }
 
   .btn:hover,
@@ -170,15 +175,12 @@
   .btn-special {
     background: #39ff14;
     color: #000;
-    border: 2px solid #39ff14;
+    border: 2px solid #ff0000;
     font-size: 20px;
     padding: 20px 32px;
     border-radius: 14px;
     font-weight: 800;
-
-    /* red glow override */
     box-shadow: 0 0 14px #ff0000;
-    border-color: #ff0000;
   }
 
   #debugLog {
@@ -234,7 +236,6 @@
         <span class="tooltip">Megohmmeter Reporting</span>
       </div>
 
-      <!-- NEW TORQUE APPLICATION BUTTON -->
       <div class="btn-wrapper">
         <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
         <span class="tooltip">View the Torque Application document</span>
@@ -258,8 +259,8 @@
   function toggleBackground() {
     const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
-    if (bg.style.opacity === '0' || bg.style.opacity === '') {
-      bg.style.opacity = '0.15';
+    if (bg.style.opacity === '0') {
+      bg.style.opacity = '0.28';
       btn.setAttribute('aria-pressed', 'true');
     } else {
       bg.style.opacity = '0';
@@ -279,7 +280,7 @@
     const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
     if (!bg.style.opacity) {
-      bg.style.opacity = '0.15';
+      bg.style.opacity = '0.28';
     }
     btn.setAttribute('aria-pressed', bg.style.opacity !== '0' ? 'true' : 'false');
   });
