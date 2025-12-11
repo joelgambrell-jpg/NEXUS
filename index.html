@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>NEXUS 2.0</title>
+
 <style>
   :root {
     --bg: #b60000;
@@ -78,6 +79,7 @@
     position: relative;
   }
 
+  /* NEON RED BUTTON GLOW */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -89,11 +91,12 @@
     text-decoration: none;
     font-size: 15px;
     font-weight: 700;
-    border: 2px solid #fff;
+    border: 2px solid #ff0000;
     box-sizing: border-box;
     cursor: pointer;
     text-align: center;
     transition: all 0.2s ease;
+    box-shadow: 0 0 12px #ff0000;
   }
 
   .btn:hover,
@@ -102,6 +105,7 @@
     color: var(--btn-hover-color);
     transform: translateY(-2px);
     outline: none;
+    box-shadow: 0 0 18px #ff0000;
   }
 
   .btn-wrapper .tooltip {
@@ -171,6 +175,10 @@
     padding: 20px 32px;
     border-radius: 14px;
     font-weight: 800;
+
+    /* red glow override */
+    box-shadow: 0 0 14px #ff0000;
+    border-color: #ff0000;
   }
 
   #debugLog {
@@ -195,6 +203,7 @@
     </button>
 
     <section class="grid">
+
       <div class="btn-wrapper">
         <a class="btn" href="transformer.html" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
         <span class="tooltip">View the transformer image</span>
@@ -224,6 +233,13 @@
         <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
         <span class="tooltip">Megohmmeter Reporting</span>
       </div>
+
+      <!-- NEW TORQUE APPLICATION BUTTON -->
+      <div class="btn-wrapper">
+        <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
+        <span class="tooltip">View the Torque Application document</span>
+      </div>
+
     </section>
 
     <div style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 20px;">
@@ -239,7 +255,6 @@
 </footer>
 
 <script>
-  // Toggle background visibility and aria-pressed
   function toggleBackground() {
     const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
@@ -252,7 +267,6 @@
     }
   }
 
-  // Debug: Log clicks on all .btn links
   document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', e => {
       const debugLog = document.getElementById('debugLog');
@@ -261,20 +275,15 @@
     });
   });
 
-  // On page load, ensure background image opacity and toggle button aria-pressed sync
   window.addEventListener('load', () => {
     const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
     if (!bg.style.opacity) {
-      bg.style.opacity = '0.15'; // default visible
+      bg.style.opacity = '0.15';
     }
     btn.setAttribute('aria-pressed', bg.style.opacity !== '0' ? 'true' : 'false');
   });
 </script>
-
-</body>
-</html>
-
 
 </body>
 </html>
