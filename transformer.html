@@ -58,7 +58,7 @@
   .close-btn {
     position: absolute;
     top: 8px;
-    right: 12px;
+    right: 48px; /* shifted left to fit return home */
     color: white;
     font-size: 24px;
     font-weight: bold;
@@ -70,6 +70,26 @@
     height: 32px;
     line-height: 32px;
     text-align: center;
+  }
+
+  /* Return to Home button */
+  .return-home-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #f39c12;
+    color: #222;
+    font-weight: bold;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    transition: background-color 0.2s ease;
+  }
+  .return-home-btn:hover {
+    background: #d48806;
   }
 
   /* Magnifier Lens */
@@ -102,6 +122,7 @@
 <!-- Modal structure -->
 <div id="imgModal" class="modal">
   <div class="modal-content">
+    <button class="return-home-btn" id="returnHomeBtn">Return to Home</button>
     <span class="close-btn" title="Close">&times;</span>
     <img id="modalImg" src="transformer.jpg" alt="Transformer Image" />
     <div class="img-magnifier-glass" id="magnifier"></div>
@@ -111,6 +132,7 @@
 <script>
   const modal = document.getElementById('imgModal');
   const closeBtn = document.querySelector('.close-btn');
+  const returnHomeBtn = document.getElementById('returnHomeBtn');
   const img = document.getElementById('modalImg');
   const magnifier = document.getElementById('magnifier');
 
@@ -123,6 +145,12 @@
   closeBtn.onclick = function() {
     modal.style.display = 'none';
     removeMagnifier();
+  };
+
+  returnHomeBtn.onclick = function() {
+    modal.style.display = 'none';
+    removeMagnifier();
+    window.location.href = '/'; // Change to your home URL if needed
   };
 
   modal.onclick = function(e) {
