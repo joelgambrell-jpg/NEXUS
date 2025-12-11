@@ -31,7 +31,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    opacity: 1; /* Fully visible */
+    opacity: 1; /* start fully visible */
     pointer-events: none;
     z-index: 0;
     transition: opacity 0.3s ease;
@@ -68,15 +68,13 @@
     margin: 0 auto 18px auto;
   }
 
-  /* Updated grid for even buttons */
   .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-columns: repeat(3, 1fr); /* 3 even columns */
     gap: 16px;
     margin-top: 8px;
   }
 
-  /* Make each button fill its grid cell */
   .btn-wrapper {
     position: relative;
   }
@@ -173,7 +171,7 @@
     padding: 10px 14px;
     border: none;
     border-radius: 8px;
-    cursor: default; /* Disable pointer for toggle as it’s off */
+    cursor: pointer;
   }
 
   .btn-special {
@@ -207,8 +205,8 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="toggle-btn" id="toggleBtn" aria-pressed="true" disabled>
-      Transformer Diagram Always Visible
+    <button class="toggle-btn" id="toggleBtn" aria-pressed="true" onclick="toggleBackground()">
+      Show/Hide Transformer Diagram
     </button>
 
     <section class="grid">
@@ -264,7 +262,17 @@
 </footer>
 
 <script>
-  // Remove toggleBackground function - no toggle anymore
+  function toggleBackground() {
+    const bg = document.getElementById('backgroundDiagram');
+    const btn = document.getElementById('toggleBtn');
+    if (bg.style.opacity === '0' || bg.style.opacity === '') {
+      bg.style.opacity = '1';
+      btn.setAttribute('aria-pressed', 'true');
+    } else {
+      bg.style.opacity = '0';
+      btn.setAttribute('aria-pressed', 'false');
+    }
+  }
 
   document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', e => {
@@ -275,8 +283,12 @@
   });
 
   window.addEventListener('load', () => {
+    const bg = document.getElementById('backgroundDiagram');
     const btn = document.getElementById('toggleBtn');
-    btn.setAttribute('aria-pressed', 'true');
+    if (!bg.style.opacity) {
+      bg.style.opacity = '1';
+    }
+    btn.setAttribute('aria-pressed', bg.style.opacity !== '0' ? 'true' : 'false');
   });
 </script>
 
