@@ -18,11 +18,6 @@
     border-radius: 16px;
     position: relative;
   }
-  a.open-modal {
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-  }
   h1 {
     margin-top: 0;
   }
@@ -77,26 +72,22 @@
     text-align: center;
   }
 
-  /* Magnifier Lens */
+  /* Magnifier Lens - doubled size */
   .img-magnifier-glass {
     position: absolute;
     border: 3px solid #fff;
     border-radius: 50%;
     cursor: none;
-    /*Set the size of the magnifier glass:*/
-    width: 120px;
-    height: 120px;
+    width: 240px;  /* doubled from 120 */
+    height: 240px; /* doubled from 120 */
     box-shadow: 0 0 8px #fff;
+    display: none; /* hidden initially */
   }
 </style>
 </head>
 
 <body>
 <div class="container">
-
-  <!-- Change the <a> to a span with a click handler -->
-  <span class="open-modal">← View Transformer Image</span>
-
   <h1>Transformer</h1>
 
   <iframe 
@@ -118,24 +109,25 @@
 </div>
 
 <script>
-  // Modal open/close
+  // Modal elements
   const modal = document.getElementById('imgModal');
-  const openModalBtn = document.querySelector('.open-modal');
   const closeBtn = document.querySelector('.close-btn');
   const img = document.getElementById('modalImg');
   const magnifier = document.getElementById('magnifier');
 
-  openModalBtn.onclick = function() {
+  // Open modal on page load
+  window.onload = function() {
     modal.style.display = 'flex';
     magnify(img, 3); // magnification zoom level
   }
 
+  // Close modal on close button click
   closeBtn.onclick = function() {
     modal.style.display = 'none';
     removeMagnifier();
   }
 
-  // Close modal if click outside image
+  // Close modal if clicking outside the image
   modal.onclick = function(e) {
     if (e.target === modal) {
       modal.style.display = 'none';
@@ -143,7 +135,7 @@
     }
   }
 
-  // Magnifier function adapted from w3schools (customized)
+  // Magnifier function
   function magnify(img, zoom) {
     let glass = magnifier;
     let w, h, bw;
@@ -187,10 +179,11 @@
     glass.addEventListener("mousemove", moveMagnifier);
     img.addEventListener("touchmove", moveMagnifier);
 
-    // Store reference for removal later
+    // Save reference for removing event listeners
     glass._moveMagnifier = moveMagnifier;
   }
 
+  // Remove magnifier event listeners and hide lens
   function removeMagnifier() {
     magnifier.style.display = 'none';
     img.removeEventListener("mousemove", magnifier._moveMagnifier);
