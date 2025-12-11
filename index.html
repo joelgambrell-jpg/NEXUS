@@ -33,7 +33,7 @@
     opacity: 0.15;
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.3s ease, display 0.3s ease;
+    transition: opacity 0.3s ease;
     display: block;
   }
 
@@ -104,7 +104,6 @@
     outline: none;
   }
 
-  /* Show tooltip on btn-wrapper hover or focus-within, and also on btn focus */
   .btn-wrapper .tooltip {
     visibility: hidden;
     opacity: 0;
@@ -164,7 +163,6 @@
     cursor: pointer;
   }
 
-  /* Special large green button */
   .btn-special {
     background: #39ff14;
     color: #000;
@@ -175,6 +173,12 @@
     font-weight: 800;
   }
 
+  #debugLog {
+    margin-top: 20px;
+    color: yellow;
+    font-size: 14px;
+    min-height: 20px;
+  }
 </style>
 </head>
 <body>
@@ -186,7 +190,9 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="toggle-btn" id="toggleBtn" aria-pressed="false" onclick="toggleBackground()">Show/Hide Transformer Diagram</button>
+    <button class="toggle-btn" id="toggleBtn" aria-pressed="true" onclick="toggleBackground()">
+      Show/Hide Transformer Diagram
+    </button>
 
     <section class="grid">
       <div class="btn-wrapper">
@@ -197,10 +203,10 @@
       <div class="btn-wrapper">
         <a class="btn" href="phenolic.html" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
         <span class="tooltip">View the Phenolic Display document</span>
-      </div> 
+      </div>
 
       <div class="btn-wrapper">
-        <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
+        <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer" id="l2Link">ℹ️ LVT L2 IVF</a>
         <span class="tooltip">View the LVT L2 IVF report</span>
       </div>
 
@@ -224,24 +230,51 @@
       <a class="btn btn-special" href="1index.html" target="_blank" rel="noopener noreferrer">Construction Check Sheet</a>
     </div>
 
+    <div id="debugLog" aria-live="polite" role="status"></div>
   </main>
 </div>
 
-<footer class="footer">© Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.</footer>
+<footer class="footer">
+  © Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.
+</footer>
 
 <script>
-function toggleBackground() {
-  const bg = document.getElementById('backgroundDiagram');
-  const btn = document.getElementById('toggleBtn');
-  if (bg.style.display === 'none' || bg.style.display === '') {
-    bg.style.display = 'block';
-    btn.setAttribute('aria-pressed', 'false');
-  } else {
-    bg.style.display = 'none';
-    btn.setAttribute('aria-pressed', 'true');
+  // Toggle background visibility and aria-pressed
+  function toggleBackground() {
+    const bg = document.getElementById('backgroundDiagram');
+    const btn = document.getElementById('toggleBtn');
+    if (bg.style.opacity === '0' || bg.style.opacity === '') {
+      bg.style.opacity = '0.15';
+      btn.setAttribute('aria-pressed', 'true');
+    } else {
+      bg.style.opacity = '0';
+      btn.setAttribute('aria-pressed', 'false');
+    }
   }
-}
+
+  // Debug: Log clicks on all .btn links
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const debugLog = document.getElementById('debugLog');
+      debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href}`;
+      console.log(`Clicked link: ${btn.textContent.trim()}, href: ${btn.href}`);
+    });
+  });
+
+  // On page load, ensure background image opacity and toggle button aria-pressed sync
+  window.addEventListener('load', () => {
+    const bg = document.getElementById('backgroundDiagram');
+    const btn = document.getElementById('toggleBtn');
+    if (!bg.style.opacity) {
+      bg.style.opacity = '0.15'; // default visible
+    }
+    btn.setAttribute('aria-pressed', bg.style.opacity !== '0' ? 'true' : 'false');
+  });
 </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
