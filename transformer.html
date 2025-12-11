@@ -4,23 +4,200 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Transformer</title>
+<style>
+  body {
+    background: #b60000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.25);
+    padding: 24px;
+    border-radius: 16px;
+    position: relative;
+  }
+  a.open-modal {
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  h1 {
+    margin-top: 0;
+  }
+  iframe {
+    width: 100%;
+    height: 80vh;
+    border: none;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+  footer.footer {
+    margin-top: 20px;
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+
+  /* Modal Styles */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+  }
+  .modal-content img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+  }
+
+  /* Magnifier Lens */
+  .img-magnifier-glass {
+    position: absolute;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    cursor: none;
+    /*Set the size of the magnifier glass:*/
+    width: 120px;
+    height: 120px;
+    box-shadow: 0 0 8px #fff;
+  }
+</style>
 </head>
 
-<body style="background:#b60000;color:#fff;font-family:Arial;">
-<div style="max-width:900px;margin:40px auto;background:rgba(255,255,255,0.25);padding:24px;border-radius:16px;">
+<body>
+<div class="container">
 
-<a href="transformer.jpg" style="color:#fff;font-weight:bold;">← Back</a>
+  <!-- Change the <a> to a span with a click handler -->
+  <span class="open-modal">← View Transformer Image</span>
 
-<h1>Transformer</h1>
+  <h1>Transformer</h1>
 
-<iframe 
-    src=""
-    style="width:100%;height:80vh;border:none;border-radius:10px;margin-top:20px;"
-    allowfullscreen>
-</iframe>
-  
-<footer class="footer">© Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.</footer>
+  <iframe 
+      src=""
+      style="width:100%;height:80vh;border:none;border-radius:10px;margin-top:20px;"
+      allowfullscreen>
+  </iframe>
+    
+  <footer class="footer">© Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.</footer>
+</div>
 
+<!-- Modal structure -->
+<div id="imgModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" title="Close">&times;</span>
+    <img id="modalImg" src="transformer.jpg" alt="Transformer Image">
+    <div class="img-magnifier-glass" id="magnifier"></div>
+  </div>
+</div>
+
+<script>
+  // Modal open/close
+  const modal = document.getElementById('imgModal');
+  const openModalBtn = document.querySelector('.open-modal');
+  const closeBtn = document.querySelector('.close-btn');
+  const img = document.getElementById('modalImg');
+  const magnifier = document.getElementById('magnifier');
+
+  openModalBtn.onclick = function() {
+    modal.style.display = 'flex';
+    magnify(img, 3); // magnification zoom level
+  }
+
+  closeBtn.onclick = function() {
+    modal.style.display = 'none';
+    removeMagnifier();
+  }
+
+  // Close modal if click outside image
+  modal.onclick = function(e) {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      removeMagnifier();
+    }
+  }
+
+  // Magnifier function adapted from w3schools (customized)
+  function magnify(img, zoom) {
+    let glass = magnifier;
+    let w, h, bw;
+
+    glass.style.backgroundImage = `url('${img.src}')`;
+    glass.style.backgroundRepeat = 'no-repeat';
+    glass.style.backgroundSize = (img.width * zoom) + 'px ' + (img.height * zoom) + 'px';
+    bw = 3;
+    w = glass.offsetWidth / 2;
+    h = glass.offsetHeight / 2;
+
+    glass.style.display = 'block';
+
+    function moveMagnifier(e) {
+      e.preventDefault();
+      let pos, x, y;
+      pos = getCursorPos(e);
+      x = pos.x;
+      y = pos.y;
+
+      if (x > img.width - (w / zoom)) { x = img.width - (w / zoom); }
+      if (x < w / zoom) { x = w / zoom; }
+      if (y > img.height - (h / zoom)) { y = img.height - (h / zoom); }
+      if (y < h / zoom) { y = h / zoom; }
+
+      glass.style.left = (x - w) + 'px';
+      glass.style.top = (y - h) + 'px';
+      glass.style.backgroundPosition = '-' + ((x * zoom) - w + bw) + 'px -' + ((y * zoom) - h + bw) + 'px';
+    }
+
+    function getCursorPos(e) {
+      let a, x = 0, y = 0;
+      e = e || window.event;
+      a = img.getBoundingClientRect();
+      x = e.pageX - a.left - window.pageXOffset;
+      y = e.pageY - a.top - window.pageYOffset;
+      return { x: x, y: y };
+    }
+
+    img.addEventListener("mousemove", moveMagnifier);
+    glass.addEventListener("mousemove", moveMagnifier);
+    img.addEventListener("touchmove", moveMagnifier);
+
+    // Store reference for removal later
+    glass._moveMagnifier = moveMagnifier;
+  }
+
+  function removeMagnifier() {
+    magnifier.style.display = 'none';
+    img.removeEventListener("mousemove", magnifier._moveMagnifier);
+    magnifier.removeEventListener("mousemove", magnifier._moveMagnifier);
+    img.removeEventListener("touchmove", magnifier._moveMagnifier);
+  }
+</script>
 
 </body>
 </html>
