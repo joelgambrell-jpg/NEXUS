@@ -6,97 +6,93 @@
 <title>LVT Meg Cover Sheet</title>
 
 <style>
-body{
-  margin:0;
-  padding:0;
-  background:#b60000;
-  font-family:Arial, sans-serif;
-  color:#fff;
+body {
+  margin: 0;
+  background: #b60000;
+  font-family: Arial, sans-serif;
+  color: #fff;
 }
 
-.container{
-  max-width:900px;
-  margin:40px auto;
-  background:rgba(255,255,255,0.20);
-  padding:30px;
-  border-radius:18px;
-  backdrop-filter:blur(6px);
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.20);
+  padding: 30px;
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+  text-align: center;
 }
 
-h1{
-  text-align:center;
-  font-size:32px;
-  font-weight:700;
-  margin-top:0;
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 0;
 }
 
-.section-title{
-  font-size:22px;
-  font-weight:bold;
-  margin:20px 0 8px;
-  border-bottom:2px solid #fff;
-  padding-bottom:6px;
+.section-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 20px 0 8px;
+  border-bottom: 2px solid #fff;
+  padding-bottom: 6px;
 }
 
-.back{
-  color:#fff;
-  text-decoration:none;
-  font-weight:bold;
-  display:inline-block;
-  margin-bottom:20px;
+.back {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
 }
 
 /* Neon pill buttons */
-.btn-wrapper{
-  margin:20px 0;
+.btn {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 16px 50px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #3ecbff;
+  background: #0a0f24;
+  border: 2px solid #00c2ff;
+  box-shadow:
+    0 0 8px #00c2ff,
+    0 0 16px #00c2ff,
+    0 0 30px #00c2ff,
+    inset 0 0 10px rgba(0, 194, 255, 0.4);
+  transition: 0.2s ease;
 }
 
-.btn{
-  display:inline-block;
-  padding:16px 50px;
-  font-size:22px;
-  font-weight:700;
-  border-radius:999px;
-  text-decoration:none;
-  color:#3ecbff;
-  background:#0a0f24;
-  border:2px solid #00c2ff;
+.btn:hover {
   box-shadow:
-      0 0 8px   #00c2ff,
-      0 0 16px  #00c2ff,
-      0 0 30px  #00c2ff,
-      inset 0 0 10px rgba(0,194,255,0.4);
-  transition:0.2s ease;
-}
-
-.btn:hover{
-  box-shadow:
-      0 0 12px  #29d9ff,
-      0 0 25px  #29d9ff,
-      0 0 45px  #29d9ff,
-      inset 0 0 14px rgba(0,194,255,0.55);
-  transform:translateY(-3px);
-  color:#6eeaff;
+    0 0 12px #29d9ff,
+    0 0 25px #29d9ff,
+    0 0 45px #29d9ff,
+    inset 0 0 14px rgba(0, 194, 255, 0.55);
+  transform: translateY(-3px);
+  color: #6eeaff;
 }
 
 /* Image with buttons over it */
-.photo-block{
-  position:relative;
-  width:100%;
-  margin:30px 0;
+.photo-block {
+  position: relative;
+  width: 100%;
+  margin: 30px 0;
 }
 
-.hero-img{
-  width:100%;
-  border-radius:18px;
+.hero-img {
+  width: 100%;
+  border-radius: 18px;
 }
 
-.center-buttons{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  text-align:center;
+.center-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
 </style>
 </head>
@@ -110,22 +106,17 @@ h1{
 
 <div class="section-title">Megohmmeter Testing of Conductors</div>
 
-<!-- IMAGE WITH BUTTONS ON TOP -->
 <div class="photo-block">
-  <img src="Tracsformer.pic.png" class="hero-img">
+  <img src="Tracsformer.pic.png" class="hero-img" alt="Transformer Image">
 
   <div class="center-buttons">
-    <div class="btn-wrapper">
-      <a class="btn" 
-         href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQB4zdld_DAmQbY4VOAUXcHmAf7SmDkVDGCEPduYPqKKEXY?e=qZ6OKd"
-         target="_blank">Line Side</a>
-    </div>
+    <a class="btn"
+       href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQB4zdld_DAmQbY4VOAUXcHmAf7SmDkVDGCEPduYPqKKEXY?e=qZ6OKd"
+       target="_blank" rel="noopener noreferrer">Line Side</a>
 
-    <div class="btn-wrapper">
-      <a class="btn" 
-         href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQBlhLsuvA8USp7ZzFiuyGW1Aa7TZBcVpZ4BvtoWGNR62AM?e=nBgi82"
-         target="_blank">Load Side</a>
-    </div>
+    <a class="btn"
+       href="https://aceelectricnet.sharepoint.com/:x:/s/CMH098QAQC/IQBlhLsuvA8USp7ZzFiuyGW1Aa7TZBcVpZ4BvtoWGNR62AM?e=nBgi82"
+       target="_blank" rel="noopener noreferrer">Load Side</a>
   </div>
 </div>
 
