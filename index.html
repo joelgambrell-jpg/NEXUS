@@ -63,7 +63,7 @@
     margin: 0 auto 18px;
   }
 
-  /* Responsive grid for buttons inside dropdown */
+  /* Responsive grid for buttons inside main dropdown */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -178,6 +178,7 @@
     border-radius: 14px;
     font-weight: 800;
     box-shadow: 0 0 14px #ff0000;
+    margin-top: 20px;
   }
 
   #debugLog {
@@ -200,10 +201,43 @@
     opacity: 1;
   }
 
-  /* Nested dropdown for Supporting Documents */
-  .nested-dropdown {
-    margin-top: 6px;
-    margin-left: 8px;
+  /* Supporting Documents dropdown container */
+  #supportingDropdownContainer {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  #supportingToggle {
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border: 2px solid #ff0000;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 0 12px #ff0000;
+    user-select: none;
+    width: 250px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  #supportingToggle:hover,
+  #supportingToggle:focus {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-color);
+    transform: translateY(-2px);
+    outline: none;
+    box-shadow: 0 0 18px #ff0000;
+  }
+
+  #supportingDropdown {
+    margin-top: 8px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -213,8 +247,8 @@
     opacity: 0;
   }
 
-  .nested-dropdown.show {
-    max-height: 500px; /* enough to show nested items */
+  #supportingDropdown.show {
+    max-height: 500px; /* enough for nested items */
     opacity: 1;
   }
 
@@ -229,6 +263,8 @@
     text-align: left;
     justify-content: flex-start;
     transition: background-color 0.2s ease, color 0.2s ease;
+    width: 250px;
+    user-select: none;
   }
 
   .nested-btn:hover,
@@ -236,11 +272,6 @@
     background: var(--btn-hover-bg);
     color: var(--btn-hover-color);
     outline: none;
-  }
-
-  /* Style the Supporting Documents button to show pointer cursor */
-  #supportingToggle {
-    justify-content: center;
   }
 </style>
 </head>
@@ -258,7 +289,7 @@
       Show Links ▼
     </button>
 
-    <!-- Dropdown container with all other buttons except Construction Check Sheet -->
+    <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
     <div id="dropdownMenu" class="dropdown-menu" hidden>
       <section class="grid">
         <div class="btn-wrapper">
@@ -274,20 +305,6 @@
         <div class="btn-wrapper">
           <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
           <span class="tooltip">View the LVT L2 IVF report</span>
-        </div>
-
-        <!-- Supporting Documents dropdown button -->
-        <div class="btn-wrapper">
-          <button class="btn" id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
-            ℹ️ Supporting Documents ▼
-          </button>
-          <span class="tooltip">View supporting documents</span>
-
-          <div id="supportingDropdown" class="nested-dropdown" hidden>
-            <a class="btn nested-btn" href="supporting-doc1.html" target="_blank" rel="noopener noreferrer">Document 1</a>
-            <a class="btn nested-btn" href="supporting-doc2.html" target="_blank" rel="noopener noreferrer">Document 2</a>
-            <a class="btn nested-btn" href="supporting-doc3.html" target="_blank" rel="noopener noreferrer">Document 3</a>
-          </div>
         </div>
 
         <div class="btn-wrapper">
@@ -307,8 +324,20 @@
       </section>
     </div>
 
+    <!-- Supporting Documents separate dropdown toggle -->
+    <div id="supportingDropdownContainer">
+      <button id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
+        ℹ️ Supporting Documents ▼
+      </button>
+      <div id="supportingDropdown" hidden>
+        <a class="nested-btn" href="supporting-doc1.html" target="_blank" rel="noopener noreferrer">Document 1</a>
+        <a class="nested-btn" href="supporting-doc2.html" target="_blank" rel="noopener noreferrer">Document 2</a>
+        <a class="nested-btn" href="supporting-doc3.html" target="_blank" rel="noopener noreferrer">Document 3</a>
+      </div>
+    </div>
+
     <!-- Always visible Construction Check Sheet button -->
-    <div class="special-btn-container" style="margin-top: 20px; display: flex; justify-content: center; grid-column: 1 / -1;">
+    <div class="special-btn-container" style="display: flex; justify-content: center;">
       <a class="btn btn-special" href="ConstructionCheckSheet.html" target="_blank" rel="noopener noreferrer">
         Construction Check Sheet
       </a>
@@ -323,24 +352,7 @@
 </footer>
 
 <script>
-  // Background toggle button logic (optional, you have toggleBtn outside dropdown, so guard against null)
-  const bg = document.getElementById('backgroundDiagram');
-  const toggleBtn = document.getElementById('toggleBtn');
   const debugLog = document.getElementById('debugLog');
-
-  if (bg) {
-    bg.style.opacity = '1';
-  }
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-pressed', 'true');
-  }
-
-  function toggleBackground() {
-    if (!bg || !toggleBtn) return;
-    const visible = bg.style.opacity !== '0';
-    bg.style.opacity = visible ? '0' : '1';
-    toggleBtn.setAttribute('aria-pressed', String(!visible));
-  }
 
   // Log clicks on all buttons/links
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
@@ -357,12 +369,12 @@
   dropdownToggle.addEventListener('click', () => {
     const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
     dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
-    dropdownToggle.textContent = isExpanded ? 'Show Links ▼' : 'Hide Links ▲';
+    dropdownToggle.textContent = isExpanded ? 'Show Actions to Complete ▼' : 'Hide Actions to Complete ▲';
     dropdownMenu.classList.toggle('show');
     dropdownMenu.hidden = isExpanded;
   });
 
-  // Nested supporting documents toggle
+  // Supporting Documents toggle
   const supportingToggle = document.getElementById('supportingToggle');
   const supportingDropdown = document.getElementById('supportingDropdown');
 
@@ -371,6 +383,9 @@
     supportingToggle.setAttribute('aria-expanded', String(!isExpanded));
     supportingDropdown.classList.toggle('show');
     supportingDropdown.hidden = isExpanded;
+    supportingToggle.textContent = isExpanded
+      ? 'ℹ️ Supporting Documents ▼'
+      : 'ℹ️ Supporting Documents ▲';
   });
 </script>
 
