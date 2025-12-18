@@ -63,22 +63,24 @@
     margin: 0 auto 18px;
   }
 
+  /* Responsive grid for buttons inside dropdown */
   .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
     margin-top: 8px;
   }
 
   .btn-wrapper {
-    position: relative;
+    width: 100%;
   }
 
   .btn-wrapper .btn {
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
     height: 60px;
   }
 
@@ -181,6 +183,20 @@
     color: yellow;
     font-size: 14px;
   }
+
+  /* Dropdown container styles */
+  .dropdown-menu {
+    margin-top: 12px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .dropdown-menu.show {
+    max-height: 2000px; /* large enough to show all content */
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -192,48 +208,53 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="toggle-btn" id="toggleBtn" onclick="toggleBackground()">
-      Show/Hide Transformer Diagram
+    <!-- Toggle button to show/hide other links -->
+    <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
+      Show Links ▼
     </button>
 
-    <section class="grid">
-      <div class="btn-wrapper">
-        <a class="btn" href="transformer.html" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
-        <span class="tooltip">View the transformer image</span>
-      </div>
+    <!-- Dropdown container with all other buttons -->
+    <div id="dropdownMenu" class="dropdown-menu" hidden>
+      <section class="grid">
+        <div class="btn-wrapper">
+          <a class="btn" href="transformer.html" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
+          <span class="tooltip">View the transformer image</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="phenolic.html" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
-        <span class="tooltip">View the Phenolic Display document</span>
-      </div>
+        <div class="btn-wrapper">
+          <a class="btn" href="phenolic.html" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
+          <span class="tooltip">View the Phenolic Display document</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
-        <span class="tooltip">View the LVT L2 IVF report</span>
-      </div>
+        <div class="btn-wrapper">
+          <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
+          <span class="tooltip">View the LVT L2 IVF report</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="supporting.html" target="_blank" rel="noopener noreferrer">ℹ️ Supporting Documents</a>
-        <span class="tooltip">View supporting documents</span>
-      </div>
+        <div class="btn-wrapper">
+          <a class="btn" href="supporting.html" target="_blank" rel="noopener noreferrer">ℹ️ Supporting Documents</a>
+          <span class="tooltip">View supporting documents</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="prefod.html" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD Link</a>
-        <span class="tooltip">Access the Pre-FOD link</span>
-      </div>
+        <div class="btn-wrapper">
+          <a class="btn" href="prefod.html" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD Link</a>
+          <span class="tooltip">Access the Pre-FOD link</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
-        <span class="tooltip">Megohmmeter Reporting</span>
-      </div>
+        <div class="btn-wrapper">
+          <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
+          <span class="tooltip">Megohmmeter Reporting</span>
+        </div>
 
-      <div class="btn-wrapper">
-        <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
-        <span class="tooltip">View the Torque Application document</span>
-      </div>
-    </section>
+        <div class="btn-wrapper">
+          <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
+          <span class="tooltip">View the Torque Application document</span>
+        </div>
+      </section>
+    </div>
 
-    <div style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 20px;">
+    <!-- Always visible Construction Check Sheet button -->
+    <div class="special-btn-container" style="margin-top: 20px; display: flex; justify-content: center; grid-column: 1 / -1;">
       <a class="btn btn-special" href="ConstructionCheckSheet.html" target="_blank" rel="noopener noreferrer">
         Construction Check Sheet
       </a>
@@ -253,12 +274,12 @@
   const debugLog = document.getElementById('debugLog');
 
   bg.style.opacity = '1';
-  toggleBtn.setAttribute('aria-pressed', 'true');
+  toggleBtn?.setAttribute('aria-pressed', 'true');
 
   function toggleBackground() {
     const visible = bg.style.opacity !== '0';
     bg.style.opacity = visible ? '0' : '1';
-    toggleBtn.setAttribute('aria-pressed', String(!visible));
+    toggleBtn?.setAttribute('aria-pressed', String(!visible));
   }
 
   document.querySelectorAll('.btn').forEach(btn => {
@@ -266,6 +287,18 @@
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href}`;
       console.log(debugLog.textContent);
     });
+  });
+
+  // Dropdown toggle functionality
+  const dropdownToggle = document.getElementById('dropdownToggle');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+
+  dropdownToggle.addEventListener('click', () => {
+    const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
+    dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
+    dropdownToggle.textContent = isExpanded ? 'Show Links ▼' : 'Hide Links ▲';
+    dropdownMenu.classList.toggle('show');
+    dropdownMenu.hidden = isExpanded;
   });
 </script>
 
