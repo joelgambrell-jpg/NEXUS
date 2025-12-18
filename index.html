@@ -273,6 +273,39 @@
     color: var(--btn-hover-color);
     outline: none;
   }
+
+  /* Completed state styles */
+  .btn.completed, .nested-btn.completed {
+    position: relative;
+    color: #2e7d32; /* green text */
+    border-color: #2e7d32;
+    box-shadow: 0 0 8px #2e7d32;
+  }
+
+  .btn.completed::after,
+  .nested-btn.completed::after {
+    content: " ✅";
+    font-size: 18px;
+    margin-left: 6px;
+    position: relative;
+    top: 1px;
+  }
+
+  /* Focus visible outline for accessibility */
+  .btn:focus, .nested-btn:focus, #supportingToggle:focus {
+    outline: 3px solid #ff0000;
+    outline-offset: 2px;
+  }
+
+  /* Responsive for small screens */
+  @media (max-width: 480px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    #supportingToggle, .nested-btn {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
@@ -354,9 +387,12 @@
 <script>
   const debugLog = document.getElementById('debugLog');
 
-  // Log clicks on all buttons/links
+  // Log clicks on all buttons/links and toggle completed state on click
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      // Toggle completed class on click
+      btn.classList.toggle('completed');
+
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
     });
@@ -387,6 +423,44 @@
       ? 'ℹ️ Supporting Documents ▼'
       : 'ℹ️ Supporting Documents ▲';
   });
+
+  // Function to update completed states from localStorage
+  function updateCompletedStates() {
+    document.querySelectorAll('.btn').forEach(btn => {
+      const href = btn.getAttribute('href');
+      if (!href) return;
+
+      const pageName = href.split('/').pop();
+      const key = pageName.replace('.html', '') + 'Completed';
+
+      if (localStorage.getItem(key) === 'true') {
+        btn.classList.add('completed');
+      } else {
+        btn.classList.remove('completed');
+      }
+    });
+
+    document.querySelectorAll('.nested-btn').forEach(btn => {
+      const href = btn.getAttribute('href');
+      if (!href) return;
+
+      const pageName = href.split('/').pop();
+      const key = pageName.replace('.html', '') + 'Completed';
+
+      if (localStorage.getItem(key) === 'true') {
+        btn.classList.add('completed');
+      } else {
+        btn.classList.remove('completed');
+      }
+    });
+  }
+
+  // Run on page load and every time the page gains focus (when user switches back)
+  window.addEventListener('load', updateCompletedStates);
+  window.addEventListener('focus', updateCompletedStates);
+
+  // Poll every 3 seconds to catch changes from other tabs
+  setInterval(updateCompletedStates, 3000);
 </script>
 
 </body>
