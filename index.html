@@ -208,9 +208,9 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <!-- Toggle button to show/hide other links -->
+    <!-- Toggle button to show/hide Tasks -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
-      Show Links ▼
+      Tasks to Complete ▼
     </button>
 
     <!-- Dropdown container with all other buttons -->
@@ -296,7 +296,7 @@
   dropdownToggle.addEventListener('click', () => {
     const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
     dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
-    dropdownToggle.textContent = isExpanded ? 'Show Links ▼' : 'Hide Links ▲';
+    dropdownToggle.textContent = isExpanded ? 'Show Tasks to Complete ▼' : 'Hide Tasks to Complete ▲';
     dropdownMenu.classList.toggle('show');
     dropdownMenu.hidden = isExpanded;
   });
