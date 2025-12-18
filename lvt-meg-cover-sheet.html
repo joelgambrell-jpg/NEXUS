@@ -121,5 +121,15 @@ h1 {
 </div>
 
 </div>
+
+<script>
+  // Mark this page as completed when any button is clicked
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('lvt-meg-cover-sheetCompleted', 'true');
+    });
+  });
+</script>
+
 </body>
 </html>
