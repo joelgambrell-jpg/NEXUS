@@ -73,6 +73,7 @@
 
   .btn-wrapper {
     width: 100%;
+    position: relative; /* For tooltip positioning */
   }
 
   .btn-wrapper .btn {
@@ -127,6 +128,7 @@
     width: max-content;
     max-width: 200px;
     pointer-events: none;
+    z-index: 10;
   }
 
   .btn-wrapper .tooltip::after {
@@ -184,7 +186,7 @@
     font-size: 14px;
   }
 
-  /* Dropdown container styles */
+  /* Main dropdown container */
   .dropdown-menu {
     margin-top: 12px;
     max-height: 0;
@@ -197,6 +199,49 @@
     max-height: 2000px; /* large enough to show all content */
     opacity: 1;
   }
+
+  /* Nested dropdown for Supporting Documents */
+  .nested-dropdown {
+    margin-top: 6px;
+    margin-left: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .nested-dropdown.show {
+    max-height: 500px; /* enough to show nested items */
+    opacity: 1;
+  }
+
+  .nested-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    box-shadow: none;
+    border: 1.5px solid #ff0000;
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    text-align: left;
+    justify-content: flex-start;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .nested-btn:hover,
+  .nested-btn:focus {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-color);
+    outline: none;
+  }
+
+  /* Style the Supporting Documents button to show pointer cursor */
+  #supportingToggle {
+    justify-content: center;
+  }
 </style>
 </head>
 <body>
@@ -208,12 +253,12 @@
 
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <!-- Toggle button to show/hide Tasks -->
+    <!-- Toggle button to show/hide other links -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
-      Tasks to Complete ▼
+      Show Links ▼
     </button>
 
-    <!-- Dropdown container with all other buttons -->
+    <!-- Dropdown container with all other buttons except Construction Check Sheet -->
     <div id="dropdownMenu" class="dropdown-menu" hidden>
       <section class="grid">
         <div class="btn-wrapper">
@@ -231,9 +276,18 @@
           <span class="tooltip">View the LVT L2 IVF report</span>
         </div>
 
+        <!-- Supporting Documents dropdown button -->
         <div class="btn-wrapper">
-          <a class="btn" href="supporting.html" target="_blank" rel="noopener noreferrer">ℹ️ Supporting Documents</a>
+          <button class="btn" id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
+            ℹ️ Supporting Documents ▼
+          </button>
           <span class="tooltip">View supporting documents</span>
+
+          <div id="supportingDropdown" class="nested-dropdown" hidden>
+            <a class="btn nested-btn" href="supporting-doc1.html" target="_blank" rel="noopener noreferrer">Document 1</a>
+            <a class="btn nested-btn" href="supporting-doc2.html" target="_blank" rel="noopener noreferrer">Document 2</a>
+            <a class="btn nested-btn" href="supporting-doc3.html" target="_blank" rel="noopener noreferrer">Document 3</a>
+          </div>
         </div>
 
         <div class="btn-wrapper">
@@ -269,36 +323,54 @@
 </footer>
 
 <script>
+  // Background toggle button logic (optional, you have toggleBtn outside dropdown, so guard against null)
   const bg = document.getElementById('backgroundDiagram');
   const toggleBtn = document.getElementById('toggleBtn');
   const debugLog = document.getElementById('debugLog');
 
-  bg.style.opacity = '1';
-  toggleBtn?.setAttribute('aria-pressed', 'true');
-
-  function toggleBackground() {
-    const visible = bg.style.opacity !== '0';
-    bg.style.opacity = visible ? '0' : '1';
-    toggleBtn?.setAttribute('aria-pressed', String(!visible));
+  if (bg) {
+    bg.style.opacity = '1';
+  }
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-pressed', 'true');
   }
 
-  document.querySelectorAll('.btn').forEach(btn => {
+  function toggleBackground() {
+    if (!bg || !toggleBtn) return;
+    const visible = bg.style.opacity !== '0';
+    bg.style.opacity = visible ? '0' : '1';
+    toggleBtn.setAttribute('aria-pressed', String(!visible));
+  }
+
+  // Log clicks on all buttons/links
+  document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href}`;
+      debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
     });
   });
 
-  // Dropdown toggle functionality
+  // Main dropdown toggle
   const dropdownToggle = document.getElementById('dropdownToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
 
   dropdownToggle.addEventListener('click', () => {
     const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
     dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
-    dropdownToggle.textContent = isExpanded ? 'Show Tasks to Complete ▼' : 'Hide Tasks to Complete ▲';
+    dropdownToggle.textContent = isExpanded ? 'Show Links ▼' : 'Hide Links ▲';
     dropdownMenu.classList.toggle('show');
     dropdownMenu.hidden = isExpanded;
+  });
+
+  // Nested supporting documents toggle
+  const supportingToggle = document.getElementById('supportingToggle');
+  const supportingDropdown = document.getElementById('supportingDropdown');
+
+  supportingToggle.addEventListener('click', () => {
+    const isExpanded = supportingToggle.getAttribute('aria-expanded') === 'true';
+    supportingToggle.setAttribute('aria-expanded', String(!isExpanded));
+    supportingDropdown.classList.toggle('show');
+    supportingDropdown.hidden = isExpanded;
   });
 </script>
 
