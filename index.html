@@ -76,6 +76,10 @@
     position: relative; /* For tooltip positioning */
   }
 
+  .apply-checks-btn {
+    margin-top: 12px;
+  }
+
   .btn-wrapper .btn {
     width: 100%;
     box-sizing: border-box;
@@ -319,40 +323,38 @@
 
     <!-- Toggle button to show/hide other links -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
-      Show Links ▼
+      Show Tasks to Complete ▼
+    </button>
+    <button class="btn apply-checks-btn" id="applyChecksBtn" type="button">
+      Apply Check Marks
     </button>
 
     <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
     <div id="dropdownMenu" class="dropdown-menu" hidden>
       <section class="grid">
         <div class="btn-wrapper">
-          <a class="btn" href="transformer.html" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
-          <span class="tooltip">View the transformer image</span>
+          <a class="btn" href="phenolic.html" data-key="rif" target="_blank" rel="noopener noreferrer">ℹ️ RIF</a>
+          <span class="tooltip">Review the RIF task</span>
         </div>
 
         <div class="btn-wrapper">
-          <a class="btn" href="phenolic.html" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
-          <span class="tooltip">View the Phenolic Display document</span>
+          <a class="btn" href="lvt-meg-cover-sheet.html" data-key="megohmmeter-testing" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Testing</a>
+          <span class="tooltip">Complete Megohmmeter Testing</span>
         </div>
 
         <div class="btn-wrapper">
-          <a class="btn" href="l2.html" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
-          <span class="tooltip">View the LVT L2 IVF report</span>
+          <a class="btn" href="torque.html" data-key="torque-application" target="_blank" rel="noopener noreferrer">ℹ️ Torque</a>
+          <span class="tooltip">View Torque resources</span>
         </div>
 
         <div class="btn-wrapper">
-          <a class="btn" href="prefod.html" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD Link</a>
-          <span class="tooltip">Access the Pre-FOD link</span>
+          <a class="btn" href="l2.html" data-key="l2-ivf" target="_blank" rel="noopener noreferrer">ℹ️ L2-IVF</a>
+          <span class="tooltip">Complete L2-IVF</span>
         </div>
 
         <div class="btn-wrapper">
-          <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
-          <span class="tooltip">Megohmmeter Reporting</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="torque.html" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
-          <span class="tooltip">View the Torque Application document</span>
+          <a class="btn" href="prefod.html" data-key="prefod" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD</a>
+          <span class="tooltip">Complete Pre-FOD</span>
         </div>
       </section>
     </div>
@@ -363,9 +365,51 @@
         ℹ️ Supporting Documents ▼
       </button>
       <div id="supportingDropdown" hidden>
-        <a class="nested-btn" href="supporting-doc1.html" target="_blank" rel="noopener noreferrer">Document 1</a>
-        <a class="nested-btn" href="supporting-doc2.html" target="_blank" rel="noopener noreferrer">Document 2</a>
-        <a class="nested-btn" href="supporting-doc3.html" target="_blank" rel="noopener noreferrer">Document 3</a>
+        <a
+          class="nested-btn"
+          href="transformer.html"
+          data-key="transformer"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Transformer Image
+        </a>
+        <a
+          class="nested-btn"
+          href="supporting.html"
+          data-key="supporting-page"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Supporting Documents Page
+        </a>
+        <a
+          class="nested-btn"
+          href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgDTzSdCCowiQJ0Rza9oIXlUASycInMyNn5KL8kpLPbjxkU?e=9fAnPb"
+          data-key="supporting-training-powerpoint"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Training PowerPoint Documents
+        </a>
+        <a
+          class="nested-btn"
+          href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAuRbIpwO8IQog9sZN4umvUAb8FLYz2qqSu8oOUvYa1Yq4?e=QHL9IJ"
+          data-key="supporting-documentation-repo"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Supporting Documentation Repository
+        </a>
+        <a
+          class="nested-btn"
+          href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAQM-row4waQbd2QWYR27mvAYSIW3WLiCt2W0EwVWlYsng?e=Brrj7W"
+          data-key="supporting-sop-general"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          SOP General Folder
+        </a>
       </div>
     </div>
 
@@ -386,12 +430,39 @@
 
 <script>
   const debugLog = document.getElementById('debugLog');
+  const showLabel = 'Show Tasks to Complete ▼';
+  const hideLabel = 'Hide Tasks to Complete ▲';
+
+  function getStorageKey(btn) {
+    const keyFromData = btn.dataset.key;
+    if (keyFromData) {
+      return `${keyFromData}Completed`;
+    }
+
+    const href = btn.getAttribute('href');
+    if (!href) return null;
+
+    const pageName = href.split('/').pop();
+    return pageName ? pageName.replace('.html', '') + 'Completed' : null;
+  }
+
+  function applyCompletion(btn, isCompleted) {
+    const storageKey = getStorageKey(btn);
+    if (!storageKey) return;
+
+    btn.classList.toggle('completed', isCompleted);
+    localStorage.setItem(storageKey, String(isCompleted));
+  }
 
   // Log clicks on all buttons/links and toggle completed state on click
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      // Toggle completed class on click
-      btn.classList.toggle('completed');
+      const storageKey = getStorageKey(btn);
+      if (!storageKey) return;
+
+      // Toggle completed class on click and persist to localStorage
+      const isCompleted = !btn.classList.contains('completed');
+      applyCompletion(btn, isCompleted);
 
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
@@ -401,11 +472,14 @@
   // Main dropdown toggle
   const dropdownToggle = document.getElementById('dropdownToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
+  const applyChecksBtn = document.getElementById('applyChecksBtn');
+
+  dropdownToggle.textContent = showLabel;
 
   dropdownToggle.addEventListener('click', () => {
     const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
     dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
-    dropdownToggle.textContent = isExpanded ? 'Show Actions to Complete ▼' : 'Hide Actions to Complete ▲';
+    dropdownToggle.textContent = isExpanded ? showLabel : hideLabel;
     dropdownMenu.classList.toggle('show');
     dropdownMenu.hidden = isExpanded;
   });
@@ -426,26 +500,9 @@
 
   // Function to update completed states from localStorage
   function updateCompletedStates() {
-    document.querySelectorAll('.btn').forEach(btn => {
-      const href = btn.getAttribute('href');
-      if (!href) return;
-
-      const pageName = href.split('/').pop();
-      const key = pageName.replace('.html', '') + 'Completed';
-
-      if (localStorage.getItem(key) === 'true') {
-        btn.classList.add('completed');
-      } else {
-        btn.classList.remove('completed');
-      }
-    });
-
-    document.querySelectorAll('.nested-btn').forEach(btn => {
-      const href = btn.getAttribute('href');
-      if (!href) return;
-
-      const pageName = href.split('/').pop();
-      const key = pageName.replace('.html', '') + 'Completed';
+    document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
+      const key = getStorageKey(btn);
+      if (!key) return;
 
       if (localStorage.getItem(key) === 'true') {
         btn.classList.add('completed');
@@ -454,6 +511,13 @@
       }
     });
   }
+
+  applyChecksBtn.addEventListener('click', () => {
+    document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
+      applyCompletion(btn, true);
+    });
+    updateCompletedStates();
+  });
 
   // Run on page load and every time the page gains focus (when user switches back)
   window.addEventListener('load', updateCompletedStates);
