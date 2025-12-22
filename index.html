@@ -324,9 +324,7 @@
     <!-- Toggle button to show/hide other links -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
       Show Actions to Complete ▼
-    </button>
-    <button class="btn apply-checks-btn" id="applyChecksBtn" type="button">
-      Apply Check Marks
+
     </button>
 
     <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
@@ -433,23 +431,11 @@
     return pageName ? pageName.replace('.html', '') + 'Completed' : null;
   }
 
-  function applyCompletion(btn, isCompleted) {
-    const storageKey = getStorageKey(btn);
-    if (!storageKey) return;
-
-    btn.classList.toggle('completed', isCompleted);
-    localStorage.setItem(storageKey, String(isCompleted));
-  }
 
   // Log clicks on all buttons/links and toggle completed state on click
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const storageKey = getStorageKey(btn);
-      if (!storageKey) return;
-
-      // Toggle completed class on click and persist to localStorage
-      const isCompleted = !btn.classList.contains('completed');
-      applyCompletion(btn, isCompleted);
 
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
@@ -460,6 +446,8 @@
   const dropdownToggle = document.getElementById('dropdownToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
   const applyChecksBtn = document.getElementById('applyChecksBtn');
+
+  dropdownToggle.textContent = showLabel;
 
   dropdownToggle.textContent = showLabel;
 
@@ -496,12 +484,7 @@
       } else {
         btn.classList.remove('completed');
       }
-    });
-  }
 
-  applyChecksBtn.addEventListener('click', () => {
-    document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
-      applyCompletion(btn, true);
     });
     updateCompletedStates();
   });
