@@ -327,8 +327,6 @@
     </button>
     <button class="btn apply-checks-btn" id="applyChecksBtn" type="button">
       Apply Check Marks
-      Show Actions to Complete ▼
-
     </button>
 
     <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
@@ -357,33 +355,6 @@
         <div class="btn-wrapper">
           <a class="btn" href="prefod.html" data-key="prefod" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD</a>
           <span class="tooltip">Complete Pre-FOD</span>
-          <a class="btn" href="transformer.html" data-key="transformer" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
-          <span class="tooltip">View the transformer image</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="phenolic.html" data-key="phenolic-display" target="_blank" rel="noopener noreferrer">ℹ️ Phenolic Display</a>
-          <span class="tooltip">View the Phenolic Display document</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="l2.html" data-key="l2-ivf" target="_blank" rel="noopener noreferrer">ℹ️ LVT L2 IVF</a>
-          <span class="tooltip">View the LVT L2 IVF report</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="prefod.html" data-key="prefod" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD Link</a>
-          <span class="tooltip">Access the Pre-FOD link</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="lvt-meg-cover-sheet.html" data-key="lvt-meg" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Reporting</a>
-          <span class="tooltip">Megohmmeter Reporting</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn" href="torque.html" data-key="torque-application" target="_blank" rel="noopener noreferrer">ℹ️ Torque Application</a>
-          <span class="tooltip">View the Torque Application document</span>
         </div>
       </section>
     </div>
@@ -461,8 +432,6 @@
   const debugLog = document.getElementById('debugLog');
   const showLabel = 'Show Tasks to Complete ▼';
   const hideLabel = 'Hide Tasks to Complete ▲';
-  const showLabel = 'Show Actions to Complete ▼';
-  const hideLabel = 'Hide Actions to Complete ▲';
 
   function getStorageKey(btn) {
     const keyFromData = btn.dataset.key;
@@ -505,31 +474,33 @@
   const dropdownMenu = document.getElementById('dropdownMenu');
   const applyChecksBtn = document.getElementById('applyChecksBtn');
 
-  dropdownToggle.textContent = showLabel;
+  if (dropdownToggle && dropdownMenu) {
+    dropdownToggle.textContent = showLabel;
 
-  dropdownToggle.textContent = showLabel;
-
-  dropdownToggle.addEventListener('click', () => {
-    const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
-    dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
-    dropdownToggle.textContent = isExpanded ? showLabel : hideLabel;
-    dropdownMenu.classList.toggle('show');
-    dropdownMenu.hidden = isExpanded;
-  });
+    dropdownToggle.addEventListener('click', () => {
+      const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
+      dropdownToggle.setAttribute('aria-expanded', String(!isExpanded));
+      dropdownToggle.textContent = isExpanded ? showLabel : hideLabel;
+      dropdownMenu.classList.toggle('show');
+      dropdownMenu.hidden = isExpanded;
+    });
+  }
 
   // Supporting Documents toggle
   const supportingToggle = document.getElementById('supportingToggle');
   const supportingDropdown = document.getElementById('supportingDropdown');
 
-  supportingToggle.addEventListener('click', () => {
-    const isExpanded = supportingToggle.getAttribute('aria-expanded') === 'true';
-    supportingToggle.setAttribute('aria-expanded', String(!isExpanded));
-    supportingDropdown.classList.toggle('show');
-    supportingDropdown.hidden = isExpanded;
-    supportingToggle.textContent = isExpanded
-      ? 'ℹ️ Supporting Documents ▼'
-      : 'ℹ️ Supporting Documents ▲';
-  });
+  if (supportingToggle && supportingDropdown) {
+    supportingToggle.addEventListener('click', () => {
+      const isExpanded = supportingToggle.getAttribute('aria-expanded') === 'true';
+      supportingToggle.setAttribute('aria-expanded', String(!isExpanded));
+      supportingDropdown.classList.toggle('show');
+      supportingDropdown.hidden = isExpanded;
+      supportingToggle.textContent = isExpanded
+        ? 'ℹ️ Supporting Documents ▼'
+        : 'ℹ️ Supporting Documents ▲';
+    });
+  }
 
   // Function to update completed states from localStorage
   function updateCompletedStates() {
@@ -545,10 +516,12 @@
     });
   }
 
-  applyChecksBtn.addEventListener('click', () => {
-    document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
-      applyCompletion(btn, true);
-
+  if (applyChecksBtn) {
+    applyChecksBtn.addEventListener('click', () => {
+      document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
+        applyCompletion(btn, true);
+      });
+      updateCompletedStates();
     });
     updateCompletedStates();
   });
