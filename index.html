@@ -13,6 +13,7 @@
     --btn-color: #000;
     --btn-hover-bg: #fff;
     --btn-hover-color: #b60000;
+    --neon: #00ff66;
   }
 
   html, body {
@@ -54,8 +55,8 @@
 
   h1 img {
     max-width: 320px;
-    display: block;
     margin: 0 auto 18px;
+    display: block;
   }
 
   .grid {
@@ -82,8 +83,9 @@
     justify-content: center;
     align-items: center;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: 0.2s;
     box-shadow: 0 0 12px #ff0000;
+    gap: 8px;
   }
 
   .btn:hover {
@@ -100,7 +102,6 @@
     left: 50%;
     transform: translateX(-50%);
     background: #000;
-    color: #fff;
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 13px;
@@ -125,11 +126,12 @@
     opacity: 1;
   }
 
+  /* Supporting dropdown */
   #supportingDropdown {
     margin-top: 8px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -138,23 +140,30 @@
   }
 
   #supportingDropdown.show {
-    max-height: 500px;
+    max-height: 600px;
     opacity: 1;
   }
 
+  /* Neon-green supporting buttons */
   .nested-btn {
-    width: 250px;
-    background: var(--btn-bg);
-    border: 1.5px solid #ff0000;
+    width: 260px;
+    background: var(--neon);
+    color: #000;
     border-radius: 10px;
-    padding: 8px 12px;
+    padding: 12px 14px;
     text-decoration: none;
-    color: var(--btn-color);
+    font-weight: bold;
+    box-shadow: 0 0 12px var(--neon);
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
   }
 
   .nested-btn:hover {
-    background: var(--btn-hover-bg);
-    color: var(--btn-hover-color);
+    box-shadow: 0 0 20px var(--neon);
+    transform: scale(1.03);
   }
 
   .btn-special {
@@ -215,9 +224,13 @@
 
 <div style="margin-top:20px">
   <button class="btn" id="supportingToggle">ℹ️ Supporting Documents ▼</button>
+
   <div id="supportingDropdown">
-    <a class="nested-btn" href="transformer.html" target="_blank">Transformer Image</a>
-    <a class="nested-btn" href="supporting.html" target="_blank">Supporting Documents Page</a>
+    <a class="nested-btn" href="transformer.html" target="_blank">🖼️ Transformer Image</a>
+    <a class="nested-btn" href="supporting.html" target="_blank">📄 Supporting Documents Page</a>
+    <a class="nested-btn" href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgDTzSdCCowiQJ0Rza9oIXlUASycInMyNn5KL8kpLPbjxkU?e=9fAnPb" target="_blank">📊 Training PowerPoint Documents</a>
+    <a class="nested-btn" href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAuRbIpwO8IQog9sZN4umvUAb8FLYz2qqSu8oOUvYa1Yq4?e=QHL9IJ" target="_blank">📁 Supporting Documentation Repository</a>
+    <a class="nested-btn" href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAQM-row4waQbd2QWYR27mvAYSIW3WLiCt2W0EwVWlYsng?e=Brrj7W" target="_blank">📘 SOP General Folder</a>
   </div>
 </div>
 
