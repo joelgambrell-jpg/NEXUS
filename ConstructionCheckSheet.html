@@ -6,76 +6,52 @@
 <title>Google Doc Access with QR Unlock</title>
 
 <style>
-  body {
-    margin: 0; 
-    font-family: Arial, Helvetica, sans-serif;
-    background: #cc0000;
-    display: flex;
-    flex-direction: column;
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#cc0000; display:flex; flex-direction:column; }
+  .container { position:relative; background:white; width:66vw; height:95vh; margin:20px auto; border-radius:12px; box-shadow:0 0 15px #900000; overflow:hidden; }
+  iframe.google-doc-embed { border:none; width:100%; height:100%; border-radius:12px; }
+
+  #lock-overlay{
+    position:absolute; inset:0; background:rgba(0,0,0,0.75); z-index:10;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:white; font-size:1.5rem; font-weight:700; text-align:center; padding:20px; border-radius:12px; gap:14px;
   }
 
-  .container {
-    position: relative;
-    background: white;
-    width: 66vw;
-    height: 95vh;
-    margin: 20px auto;
-    border-radius: 12px;
-    box-shadow: 0 0 15px #900000;
+  #qr-reader{ width:480px; height:480px; border:2px solid #4caf50; border-radius:8px; background:#111; }
+
+  #access-granted{ font-size:1.25rem; color:#4caf50; font-weight:700; display:none; }
+  #welcome-text{ font-size:1.2rem; color:#fff; font-weight:600; }
+
+  .scan-panel { width:min(900px, 92vw); display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; }
+  .scan-panel .title { font-size:1.05rem; font-weight:700; text-align:left; color:#fff; }
+  .scan-panel .actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+  .scan-panel button{
+    appearance:none; border:0; border-radius:10px; padding:8px 12px;
+    font-weight:700; cursor:pointer;
   }
 
-  iframe.google-doc-embed {
-    border: none;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
+  #clear-log { background:#fff; color:#000; }
+  #pause-log { background:#4caf50; color:#001a00; }
+  #pause-log.paused { background:#ffc107; color:#2a1c00; }
+  #toggle-cloud { background:#2196f3; color:#00142a; }
+  #toggle-cloud.off { background:#9e9e9e; color:#111; }
+
+  #scan-log{
+    width:min(900px, 92vw); max-height:180px; overflow:auto;
+    border:1px solid rgba(255,255,255,0.35); border-radius:10px;
+    background:rgba(255,255,255,0.08); padding:10px 12px; text-align:left;
+    font-size:0.95rem; font-weight:600; line-height:1.25rem;
   }
 
-  #lock-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-align: center;
-    padding: 20px;
-    border-radius: 12px;
-  }
+  .log-row{ display:grid; grid-template-columns:155px 1fr; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.12); }
+  .log-row:last-child { border-bottom:0; }
+  .ts{ color:rgba(255,255,255,0.85); font-weight:700; }
+  .code{ color:#d6ffd6; word-break:break-word; }
 
-  #qr-reader {
-    width: 480px;
-    height: 480px;
-    margin-top: 20px;
-    border: 2px solid #4caf50;
-    border-radius: 8px;
-  }
+  .log-hint{ width:min(900px, 92vw); font-size:0.9rem; font-weight:600; color:rgba(255,255,255,0.85); text-align:left; }
+  .status-line{ width:min(900px, 92vw); font-size:0.9rem; font-weight:700; text-align:left; color:#fff; opacity:0.95; }
 
-  #access-granted {
-    margin-top: 15px;
-    font-size: 1.25rem;
-    color: #4caf50;
-    font-weight: 700;
-    display: none;
-  }
-
-  #welcome-text {
-    margin-top: 10px;
-    font-size: 1.2rem;
-    color: #ffffff;
-  }
-
-  footer.footer {
-    text-align: center;
-    margin: 10px 0;
-    font-size: 0.9rem;
-    color: #fff;
-  }
+  footer.footer{ text-align:center; margin:10px 0; font-size:0.9rem; color:#fff; }
 </style>
 </head>
 <body>
@@ -89,18 +65,130 @@
 
   <div id="lock-overlay">
     <div>Scan QR code on badge to gain access</div>
+
     <div id="qr-reader"></div>
+
     <div id="access-granted">Access Granted!</div>
     <div id="welcome-text">Welcome to Nexus Construction Check Sheet</div>
+
+    <div class="scan-panel" aria-label="Scan Log Controls">
+      <div class="title">Live Scan Log</div>
+      <div class="actions">
+        <button id="toggle-cloud" class="off" type="button" title="Enable when Firebase is configured">Cloud: OFF</button>
+        <button id="pause-log" type="button">Pause</button>
+        <button id="clear-log" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="status-line" id="cloud-status">Cloud status: not configured (local logging only)</div>
+    <div class="log-hint">Logs every decoded scan in real time. Optional cloud upload is queued and will auto-flush once enabled.</div>
+    <div id="scan-log" aria-live="polite"></div>
   </div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-<script>
+<!--
+  Firebase is intentionally NOT loaded yet.
+  When you're ready, uncomment the Firebase module import section below and paste your config.
+-->
+
+<script type="module">
+  /******************************************************************
+   * 1) Firebase "adapter" placeholders (safe to leave as-is for now)
+   ******************************************************************/
+  const FIREBASE = {
+    configured: false,   // becomes true once you paste config + init below
+    enabled: false,      // user toggle (Cloud ON/OFF)
+    app: null,
+    db: null,
+    // writeScan: async (scanObj) => { ... } // implemented when configured
+  };
+
+  // ---- When you're ready, do this:
+  //
+  // A) Uncomment imports:
+  // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  // import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  //
+  // B) Paste your firebaseConfig from Firebase console
+  // const firebaseConfig = { apiKey:"...", authDomain:"...", projectId:"...", ... };
+  //
+  // C) Initialize + implement writeScan:
+  // FIREBASE.app = initializeApp(firebaseConfig);
+  // FIREBASE.db = getFirestore(FIREBASE.app);
+  // FIREBASE.configured = true;
+  // FIREBASE.writeScan = async (scanObj) => {
+  //   // Example collection: "scans"
+  //   await addDoc(collection(FIREBASE.db, "scans"), {
+  //     ...scanObj,
+  //     createdAt: serverTimestamp()
+  //   });
+  // };
+
+  /******************************************************************
+   * 2) UI + local logging (works now)
+   ******************************************************************/
   const lockOverlay = document.getElementById('lock-overlay');
   const accessGrantedMsg = document.getElementById('access-granted');
+
+  const scanLogEl = document.getElementById('scan-log');
+  const clearBtn = document.getElementById('clear-log');
+  const pauseBtn = document.getElementById('pause-log');
+  const cloudBtn = document.getElementById('toggle-cloud');
+  const cloudStatus = document.getElementById('cloud-status');
+
   let qrScanner;
+
+  const MAX_LOG_ROWS = 250;
+  const DUPLICATE_WINDOW_MS = 2000;
+
+  let isPaused = false;
+  let lastSeen = new Map(); // code -> last timestamp ms
+
+  function nowTimestamp() {
+    const d = new Date();
+    return d.toLocaleString(undefined, {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    });
+  }
+
+  function appendLog(code, note = "") {
+    if (isPaused) return;
+    const row = document.createElement('div');
+    row.className = 'log-row';
+
+    const ts = document.createElement('div');
+    ts.className = 'ts';
+    ts.textContent = nowTimestamp();
+
+    const value = document.createElement('div');
+    value.className = 'code';
+    value.textContent = note ? `${code} (${note})` : code;
+
+    row.appendChild(ts);
+    row.appendChild(value);
+    scanLogEl.prepend(row);
+
+    while (scanLogEl.children.length > MAX_LOG_ROWS) {
+      scanLogEl.removeChild(scanLogEl.lastElementChild);
+    }
+  }
+
+  function shouldLog(code) {
+    const t = Date.now();
+    const last = lastSeen.get(code);
+    if (last && (t - last) < DUPLICATE_WINDOW_MS) return false;
+    lastSeen.set(code, t);
+
+    if (lastSeen.size > 500) {
+      for (const [k, v] of lastSeen) {
+        if (t - v > 60000) lastSeen.delete(k);
+      }
+    }
+    return true;
+  }
 
   function unlockAccess() {
     accessGrantedMsg.style.display = 'block';
@@ -108,8 +196,103 @@
     if (qrScanner) qrScanner.stop();
   }
 
-  const onScanSuccess = code => {
-    if (/^\d{7}$/.test(code.trim())) unlockAccess();
+  /******************************************************************
+   * 3) Cloud queue (works now, stores locally; uploads once enabled)
+   ******************************************************************/
+  const QUEUE_KEY = "nexus_scan_queue_v1";
+
+  function loadQueue() {
+    try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || "[]"); }
+    catch { return []; }
+  }
+  function saveQueue(queue) {
+    try { localStorage.setItem(QUEUE_KEY, JSON.stringify(queue)); } catch {}
+  }
+
+  async function enqueueScan(scanObj) {
+    const q = loadQueue();
+    q.unshift(scanObj);
+    // Keep queue bounded
+    if (q.length > 500) q.length = 500;
+    saveQueue(q);
+  }
+
+  function setCloudUI() {
+    if (!FIREBASE.configured) {
+      cloudBtn.classList.add("off");
+      cloudBtn.textContent = "Cloud: OFF";
+      cloudStatus.textContent = "Cloud status: not configured (local logging only)";
+      return;
+    }
+    if (FIREBASE.enabled) {
+      cloudBtn.classList.remove("off");
+      cloudBtn.textContent = "Cloud: ON";
+      cloudStatus.textContent = "Cloud status: enabled (uploads + queue flush active)";
+    } else {
+      cloudBtn.classList.add("off");
+      cloudBtn.textContent = "Cloud: OFF";
+      cloudStatus.textContent = "Cloud status: configured but disabled (queueing only)";
+    }
+  }
+
+  async function flushQueue() {
+    if (!FIREBASE.configured || !FIREBASE.enabled || typeof FIREBASE.writeScan !== "function") return;
+    if (!navigator.onLine) return;
+
+    const q = loadQueue();
+    if (!q.length) return;
+
+    // Oldest first so timestamps are in order in the database
+    const items = q.slice().reverse();
+
+    // Upload sequentially to reduce rate-limit surprises
+    const remaining = [];
+    for (const item of items) {
+      try {
+        await FIREBASE.writeScan(item);
+      } catch (e) {
+        // If anything fails, keep this and the rest for later retry
+        remaining.push(item);
+      }
+    }
+
+    // remaining currently oldest->newest; store back newest-first
+    saveQueue(remaining.reverse());
+  }
+
+  async function maybeCloudRecord(scanObj) {
+    // Always queue locally so nothing is lost if offline / cloud disabled.
+    await enqueueScan(scanObj);
+
+    // Attempt immediate upload if possible.
+    await flushQueue();
+  }
+
+  window.addEventListener("online", () => { flushQueue(); });
+
+  /******************************************************************
+   * 4) Scanner callback: logs + queues + optional cloud upload
+   ******************************************************************/
+  const onScanSuccess = async decodedText => {
+    const code = (decodedText || "").trim();
+    if (!code) return;
+
+    if (!shouldLog(code)) return;
+
+    const isValid = /^\d{7}$/.test(code);
+    appendLog(code, isValid ? "valid" : "invalid");
+
+    const scanObj = {
+      code,
+      valid: isValid,
+      scannedAtLocal: new Date().toISOString(),
+      // Add a stable per-device id (helps when multiple devices scan)
+      deviceId: getDeviceId()
+    };
+
+    await maybeCloudRecord(scanObj);
+
+    if (isValid) unlockAccess();
   };
 
   function startScanner() {
@@ -119,13 +302,58 @@
     qrScanner.start({ facingMode: "environment" }, config, onScanSuccess)
       .catch(() =>
         qrScanner.start({ facingMode: "user" }, config, onScanSuccess)
-          .catch(() =>
-            alert('Failed to start camera for QR scanning. Please check permissions.')
-          )
+          .catch(() => alert('Failed to start camera for QR scanning. Please check permissions.'))
       );
   }
 
-  window.addEventListener('load', startScanner);
+  /******************************************************************
+   * 5) Device ID helper (stored locally per device)
+   ******************************************************************/
+  const DEVICE_KEY = "nexus_device_id_v1";
+  function getDeviceId() {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      id = (crypto?.randomUUID?.() || (`dev-${Math.random().toString(16).slice(2)}-${Date.now()}`));
+      try { localStorage.setItem(DEVICE_KEY, id); } catch {}
+    }
+    return id;
+  }
+
+  /******************************************************************
+   * 6) Controls
+   ******************************************************************/
+  clearBtn.addEventListener('click', () => {
+    scanLogEl.innerHTML = "";
+    lastSeen.clear();
+    localStorage.removeItem(QUEUE_KEY);
+    appendLog("Cleared log + local queue", "system");
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    isPaused = !isPaused;
+    pauseBtn.classList.toggle('paused', isPaused);
+    pauseBtn.textContent = isPaused ? "Resume" : "Pause";
+  });
+
+  cloudBtn.addEventListener('click', async () => {
+    if (!FIREBASE.configured) {
+      appendLog("Cloud not configured yet", "system");
+      setCloudUI();
+      return;
+    }
+    FIREBASE.enabled = !FIREBASE.enabled;
+    setCloudUI();
+    if (FIREBASE.enabled) await flushQueue();
+  });
+
+  /******************************************************************
+   * 7) Boot
+   ******************************************************************/
+  window.addEventListener('load', () => {
+    appendLog("Scanner initializing...", "system");
+    setCloudUI();
+    startScanner();
+  });
 </script>
 
 <footer class="footer">
@@ -134,4 +362,9 @@
 
 </body>
 </html>
+
+
+</body>
+</html>
+
 
