@@ -76,6 +76,10 @@
     position: relative; /* For tooltip positioning */
   }
 
+  .apply-checks-btn {
+    margin-top: 12px;
+  }
+
   .btn-wrapper .btn {
     width: 100%;
     box-sizing: border-box;
@@ -320,6 +324,7 @@
     <!-- Toggle button to show/hide other links -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
       Show Actions to Complete ▼
+
     </button>
 
     <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
@@ -426,15 +431,11 @@
     return pageName ? pageName.replace('.html', '') + 'Completed' : null;
   }
 
+
   // Log clicks on all buttons/links and toggle completed state on click
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const storageKey = getStorageKey(btn);
-      // Toggle completed class on click and persist to localStorage
-      const isCompleted = btn.classList.toggle('completed');
-      if (storageKey) {
-        localStorage.setItem(storageKey, String(isCompleted));
-      }
 
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
@@ -444,6 +445,9 @@
   // Main dropdown toggle
   const dropdownToggle = document.getElementById('dropdownToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
+  const applyChecksBtn = document.getElementById('applyChecksBtn');
+
+  dropdownToggle.textContent = showLabel;
 
   dropdownToggle.textContent = showLabel;
 
@@ -480,8 +484,10 @@
       } else {
         btn.classList.remove('completed');
       }
+
     });
-  }
+    updateCompletedStates();
+  });
 
   // Run on page load and every time the page gains focus (when user switches back)
   window.addEventListener('load', updateCompletedStates);
