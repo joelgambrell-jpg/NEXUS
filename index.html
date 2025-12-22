@@ -30,7 +30,6 @@
     object-fit: contain;
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.3s ease;
   }
 
   .page-wrap {
@@ -46,190 +45,84 @@
   main.container {
     width: 100%;
     max-width: 960px;
-    margin: 0 auto;
     background: var(--panel);
     padding: 28px;
     border-radius: 18px;
     backdrop-filter: blur(6px);
     text-align: center;
-    box-sizing: border-box;
   }
 
   h1 img {
     max-width: 320px;
-    width: 100%;
-    height: auto;
     display: block;
     margin: 0 auto 18px;
   }
 
-  /* Responsive grid for buttons inside main dropdown */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
-    margin-top: 8px;
   }
 
   .btn-wrapper {
-    width: 100%;
     position: relative;
   }
 
-  .apply-checks-btn {
-    margin-top: 12px;
-  }
-
-  .btn-wrapper .btn {
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 60px;
-  }
-
   .btn {
-    gap: 6px;
+    width: 100%;
+    height: 60px;
     background: var(--btn-bg);
     color: var(--btn-color);
-    padding: 14px 16px;
+    border: 2px solid #ff0000;
     border-radius: 12px;
-    text-decoration: none;
     font-size: 15px;
     font-weight: 700;
-    border: 2px solid #ff0000;
     cursor: pointer;
-    text-align: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 12px #ff0000;
-    user-select: none;
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 12px #ff0000;
   }
 
-  .btn:hover,
-  .btn:focus {
+  .btn:hover {
     background: var(--btn-hover-bg);
     color: var(--btn-hover-color);
     transform: translateY(-2px);
-    outline: none;
-    box-shadow: 0 0 18px #ff0000;
   }
 
-  .btn-wrapper .tooltip {
+  .tooltip {
     visibility: hidden;
     opacity: 0;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 6px 10px;
     position: absolute;
     bottom: 110%;
     left: 50%;
     transform: translateX(-50%);
-    transition: opacity 0.2s;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
     font-size: 13px;
-    width: max-content;
-    max-width: 200px;
-    pointer-events: none;
-    z-index: 10;
+    transition: opacity 0.2s;
   }
 
-  .btn-wrapper .tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: #000 transparent transparent;
-  }
-
-  .btn-wrapper:hover .tooltip,
-  .btn-wrapper:focus-within .tooltip {
+  .btn-wrapper:hover .tooltip {
     visibility: visible;
     opacity: 1;
   }
 
-  .footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    padding: 12px 0;
-    font-size: 16px;
-    z-index: 10;
-  }
-
-  .btn-special {
-    background: #39ff14;
-    color: #000;
-    border: 2px solid #ff0000;
-    font-size: 20px;
-    padding: 20px 32px;
-    border-radius: 14px;
-    font-weight: 800;
-    box-shadow: 0 0 14px #ff0000;
-    margin-top: 20px;
-  }
-
-  #debugLog {
-    margin-top: 20px;
-    color: yellow;
-    font-size: 14px;
-  }
-
-  /* Main dropdown container */
   .dropdown-menu {
     margin-top: 12px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
     opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
   }
 
   .dropdown-menu.show {
     max-height: 2000px;
     opacity: 1;
-  }
-
-  /* Supporting Documents dropdown container */
-  #supportingDropdownContainer {
-    margin-top: 20px;
-    text-align: center;
-  }
-
-  #supportingToggle {
-    background: var(--btn-bg);
-    color: var(--btn-color);
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    border: 2px solid #ff0000;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 0 12px #ff0000;
-    user-select: none;
-    width: 250px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-  }
-
-  #supportingToggle:hover,
-  #supportingToggle:focus {
-    background: var(--btn-hover-bg);
-    color: var(--btn-hover-color);
-    transform: translateY(-2px);
-    outline: none;
-    box-shadow: 0 0 18px #ff0000;
   }
 
   #supportingDropdown {
@@ -239,8 +132,8 @@
     gap: 8px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
     opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
     align-items: center;
   }
 
@@ -250,268 +143,119 @@
   }
 
   .nested-btn {
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    box-shadow: none;
-    border: 1.5px solid #ff0000;
-    background: var(--btn-bg);
-    color: var(--btn-color);
-    text-align: left;
-    justify-content: flex-start;
-    transition: background-color 0.2s ease, color 0.2s ease;
     width: 250px;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    background: var(--btn-bg);
+    border: 1.5px solid #ff0000;
+    border-radius: 10px;
+    padding: 8px 12px;
     text-decoration: none;
-    box-sizing: border-box;
+    color: var(--btn-color);
   }
 
-  .nested-btn:hover,
-  .nested-btn:focus {
+  .nested-btn:hover {
     background: var(--btn-hover-bg);
     color: var(--btn-hover-color);
-    outline: none;
   }
 
-  /* Completed state styles */
-  .btn.completed, .nested-btn.completed {
-    position: relative;
-    color: #2e7d32;
-    border-color: #2e7d32;
-    box-shadow: 0 0 8px #2e7d32;
+  .btn-special {
+    background: #39ff14;
+    font-size: 20px;
+    padding: 20px 32px;
+    border-radius: 14px;
+    font-weight: 800;
+    margin-top: 20px;
   }
 
-  .btn.completed::after,
-  .nested-btn.completed::after {
-    content: " ✅";
-    font-size: 18px;
-    margin-left: 6px;
-    position: relative;
-    top: 1px;
-  }
-
-  /* Focus visible outline for accessibility */
-  .btn:focus, .nested-btn:focus, #supportingToggle:focus {
-    outline: 3px solid #ff0000;
-    outline-offset: 2px;
-  }
-
-  /* Responsive for small screens */
-  @media (max-width: 480px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
-    #supportingToggle, .nested-btn {
-      width: 100%;
-    }
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    font-size: 16px;
   }
 </style>
 </head>
 
 <body>
-<img id="backgroundDiagram" class="background-image" src="transformer.jpg" alt="Transformer Diagram" />
+
+<img class="background-image" src="transformer.jpg" alt="Transformer Diagram">
 
 <div class="page-wrap">
-  <main class="container">
-    <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
+<main class="container">
 
-    <!-- Toggle button to show/hide other links -->
-    <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu" type="button">
-      Show Tasks to Complete ▼
-    </button>
+<h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <button class="btn apply-checks-btn" id="applyChecksBtn" type="button">
-      Apply Check Marks
-    </button>
+<button class="btn" id="dropdownToggle">Show Tasks to Complete ▼</button>
 
-    <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
-    <div id="dropdownMenu" class="dropdown-menu" hidden>
-      <section class="grid">
-        <div class="btn-wrapper">
-          <a class="btn task-link" href="phenolic.html" data-key="rif" target="_blank" rel="noopener noreferrer">ℹ️ RIF</a>
-          <span class="tooltip">Review the RIF task</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn task-link" href="lvt-meg-cover-sheet.html" data-key="megohmmeter-testing" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Testing</a>
-          <span class="tooltip">Complete Megohmmeter Testing</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn task-link" href="torque.html" data-key="torque-application" target="_blank" rel="noopener noreferrer">ℹ️ Torque</a>
-          <span class="tooltip">View Torque resources</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn task-link" href="l2.html" data-key="l2-ivf" target="_blank" rel="noopener noreferrer">ℹ️ L2-IVF</a>
-          <span class="tooltip">Complete L2-IVF</span>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="btn task-link" href="prefod.html" data-key="prefod" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD</a>
-          <span class="tooltip">Complete Pre-FOD</span>
-        </div>
-      </section>
+<div id="dropdownMenu" class="dropdown-menu">
+  <section class="grid">
+    <div class="btn-wrapper">
+      <a class="btn" href="phenolic.html" target="_blank">ℹ️ RIF</a>
+      <span class="tooltip">Review the RIF task</span>
     </div>
-
-    <!-- Supporting Documents separate dropdown toggle -->
-    <div id="supportingDropdownContainer">
-      <button id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
-        ℹ️ Supporting Documents ▼
-      </button>
-
-      <div id="supportingDropdown" hidden>
-        <a class="nested-btn support-link" href="transformer.html" data-key="transformer" target="_blank" rel="noopener noreferrer">
-          Transformer Image
-        </a>
-
-        <a class="nested-btn support-link" href="supporting.html" data-key="supporting-page" target="_blank" rel="noopener noreferrer">
-          Supporting Documents Page
-        </a>
-
-        <a class="nested-btn support-link"
-           href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgDTzSdCCowiQJ0Rza9oIXlUASycInMyNn5KL8kpLPbjxkU?e=9fAnPb"
-           data-key="supporting-training-powerpoint"
-           target="_blank" rel="noopener noreferrer">
-          Training PowerPoint Documents
-        </a>
-
-        <a class="nested-btn support-link"
-           href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAuRbIpwO8IQog9sZN4umvUAb8FLYz2qqSu8oOUvYa1Yq4?e=QHL9IJ"
-           data-key="supporting-documentation-repo"
-           target="_blank" rel="noopener noreferrer">
-          Supporting Documentation Repository
-        </a>
-
-        <a class="nested-btn support-link"
-           href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAQM-row4waQbd2QWYR27mvAYSIW3WLiCt2W0EwVWlYsng?e=Brrj7W"
-           data-key="supporting-sop-general"
-           target="_blank" rel="noopener noreferrer">
-          SOP General Folder
-        </a>
-      </div>
+    <div class="btn-wrapper">
+      <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank">ℹ️ Megohmmeter Testing</a>
+      <span class="tooltip">Complete Megohmmeter Testing</span>
     </div>
-
-    <!-- Always visible Construction Check Sheet button -->
-    <div class="special-btn-container" style="display: flex; justify-content: center;">
-      <a class="btn btn-special task-link" href="ConstructionCheckSheet.html" data-key="construction-check-sheet" target="_blank" rel="noopener noreferrer">
-        Construction Check Sheet
-      </a>
+    <div class="btn-wrapper">
+      <a class="btn" href="torque.html" target="_blank">ℹ️ Torque</a>
+      <span class="tooltip">View Torque resources</span>
     </div>
-
-    <div id="debugLog" aria-live="polite" role="status"></div>
-  </main>
+    <div class="btn-wrapper">
+      <a class="btn" href="l2.html" target="_blank">ℹ️ L2-IVF</a>
+      <span class="tooltip">Complete L2-IVF</span>
+    </div>
+    <div class="btn-wrapper">
+      <a class="btn" href="prefod.html" target="_blank">ℹ️ Pre-FOD</a>
+      <span class="tooltip">Complete Pre-FOD</span>
+    </div>
+  </section>
 </div>
 
-<footer class="footer">
-  © Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.
+<div style="margin-top:20px">
+  <button class="btn" id="supportingToggle">ℹ️ Supporting Documents ▼</button>
+  <div id="supportingDropdown">
+    <a class="nested-btn" href="transformer.html" target="_blank">Transformer Image</a>
+    <a class="nested-btn" href="supporting.html" target="_blank">Supporting Documents Page</a>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:center;">
+  <a class="btn btn-special" href="ConstructionCheckSheet.html" target="_blank">
+    Construction Check Sheet
+  </a>
+</div>
+
+</main>
+</div>
+
+<footer>
+© Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.
 </footer>
 
 <script>
-  const debugLog = document.getElementById('debugLog');
-
-  const showLabel = 'Show Tasks to Complete ▼';
-  const hideLabel = 'Hide Tasks to Complete ▲';
-
-  function getStorageKey(el) {
-    const keyFromData = el.dataset.key;
-    if (keyFromData) return `${keyFromData}Completed`;
-
-    const href = el.getAttribute('href');
-    if (!href) return null;
-
-    const pageName = href.split('/').pop();
-    return pageName ? pageName.replace('.html', '') + 'Completed' : null;
-  }
-
-  function setCompleted(el, isCompleted) {
-    const storageKey = getStorageKey(el);
-    if (!storageKey) return;
-
-    el.classList.toggle('completed', isCompleted);
-    localStorage.setItem(storageKey, String(isCompleted));
-  }
-
-  function updateCompletedStates() {
-    document.querySelectorAll('.task-link, .support-link').forEach(el => {
-      const key = getStorageKey(el);
-      if (!key) return;
-
-      const isCompleted = localStorage.getItem(key) === 'true';
-      el.classList.toggle('completed', isCompleted);
-    });
-  }
-
-  // Mark complete on click WITHOUT blocking navigation.
-  // Use capture so it runs before the browser leaves the page.
-  document.querySelectorAll('.task-link, .support-link').forEach(el => {
-    el.addEventListener('click', () => {
-      const storageKey = getStorageKey(el);
-      if (!storageKey) return;
-
-      setCompleted(el, true);
-
-      debugLog.textContent = `Opened: ${el.textContent.trim()}`;
-      console.log(debugLog.textContent);
-    }, { capture: true });
-  });
-
-  // Main dropdown toggle
   const dropdownToggle = document.getElementById('dropdownToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
-
-  function setDropdown(open) {
-    dropdownToggle.setAttribute('aria-expanded', String(open));
-    dropdownToggle.textContent = open ? hideLabel : showLabel;
-    dropdownMenu.classList.toggle('show', open);
-    dropdownMenu.hidden = !open;
-  }
-
-  if (dropdownToggle && dropdownMenu) {
-    setDropdown(false);
-    dropdownToggle.addEventListener('click', () => {
-      const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
-      setDropdown(!isExpanded);
-    });
-  }
-
-  // Supporting Documents toggle
   const supportingToggle = document.getElementById('supportingToggle');
   const supportingDropdown = document.getElementById('supportingDropdown');
 
-  function setSupporting(open) {
-    supportingToggle.setAttribute('aria-expanded', String(open));
-    supportingToggle.textContent = open ? 'ℹ️ Supporting Documents ▲' : 'ℹ️ Supporting Documents ▼';
-    supportingDropdown.classList.toggle('show', open);
-    supportingDropdown.hidden = !open;
-  }
+  dropdownToggle.onclick = () => {
+    dropdownMenu.classList.toggle('show');
+    dropdownToggle.textContent =
+      dropdownMenu.classList.contains('show')
+        ? 'Hide Tasks to Complete ▲'
+        : 'Show Tasks to Complete ▼';
+  };
 
-  if (supportingToggle && supportingDropdown) {
-    setSupporting(false);
-    supportingToggle.addEventListener('click', () => {
-      const isExpanded = supportingToggle.getAttribute('aria-expanded') === 'true';
-      setSupporting(!isExpanded);
-    });
-  }
-
-  // Apply Check Marks: mark all as complete
-  const applyChecksBtn = document.getElementById('applyChecksBtn');
-  if (applyChecksBtn) {
-    applyChecksBtn.addEventListener('click', () => {
-      document.querySelectorAll('.task-link, .support-link').forEach(el => setCompleted(el, true));
-      updateCompletedStates();
-    });
-  }
-
-  // Run on page load and when tab refocuses
-  window.addEventListener('load', updateCompletedStates);
-  window.addEventListener('focus', updateCompletedStates);
-
-  // Poll every 3 seconds to catch changes from other tabs
-  setInterval(updateCompletedStates, 3000);
+  supportingToggle.onclick = () => {
+    supportingDropdown.classList.toggle('show');
+    supportingToggle.textContent =
+      supportingDropdown.classList.contains('show')
+        ? 'ℹ️ Supporting Documents ▲'
+        : 'ℹ️ Supporting Documents ▼';
+  };
 </script>
+
 </body>
 </html>
