@@ -323,6 +323,10 @@
 
     <!-- Toggle button to show/hide other links -->
     <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu">
+      Show Tasks to Complete ▼
+    </button>
+    <button class="btn apply-checks-btn" id="applyChecksBtn" type="button">
+      Apply Check Marks
       Show Actions to Complete ▼
 
     </button>
@@ -331,6 +335,28 @@
     <div id="dropdownMenu" class="dropdown-menu" hidden>
       <section class="grid">
         <div class="btn-wrapper">
+          <a class="btn" href="phenolic.html" data-key="rif" target="_blank" rel="noopener noreferrer">ℹ️ RIF</a>
+          <span class="tooltip">Review the RIF task</span>
+        </div>
+
+        <div class="btn-wrapper">
+          <a class="btn" href="lvt-meg-cover-sheet.html" data-key="megohmmeter-testing" target="_blank" rel="noopener noreferrer">ℹ️ Megohmmeter Testing</a>
+          <span class="tooltip">Complete Megohmmeter Testing</span>
+        </div>
+
+        <div class="btn-wrapper">
+          <a class="btn" href="torque.html" data-key="torque-application" target="_blank" rel="noopener noreferrer">ℹ️ Torque</a>
+          <span class="tooltip">View Torque resources</span>
+        </div>
+
+        <div class="btn-wrapper">
+          <a class="btn" href="l2.html" data-key="l2-ivf" target="_blank" rel="noopener noreferrer">ℹ️ L2-IVF</a>
+          <span class="tooltip">Complete L2-IVF</span>
+        </div>
+
+        <div class="btn-wrapper">
+          <a class="btn" href="prefod.html" data-key="prefod" target="_blank" rel="noopener noreferrer">ℹ️ Pre-FOD</a>
+          <span class="tooltip">Complete Pre-FOD</span>
           <a class="btn" href="transformer.html" data-key="transformer" target="_blank" rel="noopener noreferrer">ℹ️ Transformer Image</a>
           <span class="tooltip">View the transformer image</span>
         </div>
@@ -368,6 +394,24 @@
         ℹ️ Supporting Documents ▼
       </button>
       <div id="supportingDropdown" hidden>
+        <a
+          class="nested-btn"
+          href="transformer.html"
+          data-key="transformer"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Transformer Image
+        </a>
+        <a
+          class="nested-btn"
+          href="supporting.html"
+          data-key="supporting-page"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Supporting Documents Page
+        </a>
         <a
           class="nested-btn"
           href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgDTzSdCCowiQJ0Rza9oIXlUASycInMyNn5KL8kpLPbjxkU?e=9fAnPb"
@@ -415,6 +459,8 @@
 
 <script>
   const debugLog = document.getElementById('debugLog');
+  const showLabel = 'Show Tasks to Complete ▼';
+  const hideLabel = 'Hide Tasks to Complete ▲';
   const showLabel = 'Show Actions to Complete ▼';
   const hideLabel = 'Hide Actions to Complete ▲';
 
@@ -431,11 +477,23 @@
     return pageName ? pageName.replace('.html', '') + 'Completed' : null;
   }
 
+  function applyCompletion(btn, isCompleted) {
+    const storageKey = getStorageKey(btn);
+    if (!storageKey) return;
+
+    btn.classList.toggle('completed', isCompleted);
+    localStorage.setItem(storageKey, String(isCompleted));
+  }
 
   // Log clicks on all buttons/links and toggle completed state on click
   document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const storageKey = getStorageKey(btn);
+      if (!storageKey) return;
+
+      // Toggle completed class on click and persist to localStorage
+      const isCompleted = !btn.classList.contains('completed');
+      applyCompletion(btn, isCompleted);
 
       debugLog.textContent = `Clicked link: ${btn.textContent.trim()}, href: ${btn.href || 'N/A'}`;
       console.log(debugLog.textContent);
@@ -484,6 +542,12 @@
       } else {
         btn.classList.remove('completed');
       }
+    });
+  }
+
+  applyChecksBtn.addEventListener('click', () => {
+    document.querySelectorAll('.btn, .nested-btn').forEach(btn => {
+      applyCompletion(btn, true);
 
     });
     updateCompletedStates();
