@@ -30,7 +30,6 @@
     object-fit: contain;
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.3s ease;
   }
 
   .page-wrap {
@@ -63,7 +62,6 @@
     margin: 0 auto 18px;
   }
 
-  /* Responsive grid for buttons inside main dropdown */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -76,14 +74,10 @@
     position: relative;
   }
 
-  .apply-checks-btn {
-    margin-top: 12px;
-  }
-
   .btn-wrapper .btn {
     width: 100%;
     box-sizing: border-box;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
     height: 60px;
@@ -155,16 +149,6 @@
     opacity: 1;
   }
 
-  .footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    padding: 12px 0;
-    font-size: 16px;
-    z-index: 10;
-  }
-
   .btn-special {
     background: #39ff14;
     color: #000;
@@ -183,53 +167,27 @@
     font-size: 14px;
   }
 
-  /* Main dropdown container */
-  .dropdown-menu {
+  /* Dropdown panels: DO NOT use [hidden] here; it prevents transitions and can appear "stuck". */
+  .dropdown-panel {
     margin-top: 12px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
     opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
   }
 
-  .dropdown-menu.show {
+  .dropdown-panel.is-open {
     max-height: 2000px;
     opacity: 1;
   }
 
-  /* Supporting Documents dropdown container */
   #supportingDropdownContainer {
     margin-top: 20px;
     text-align: center;
   }
 
   #supportingToggle {
-    background: var(--btn-bg);
-    color: var(--btn-color);
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    border: 2px solid #ff0000;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 0 12px #ff0000;
-    user-select: none;
     width: 250px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-  }
-
-  #supportingToggle:hover,
-  #supportingToggle:focus {
-    background: var(--btn-hover-bg);
-    color: var(--btn-hover-color);
-    transform: translateY(-2px);
-    outline: none;
-    box-shadow: 0 0 18px #ff0000;
   }
 
   #supportingDropdown {
@@ -237,16 +195,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
     align-items: center;
-  }
-
-  #supportingDropdown.show {
-    max-height: 500px;
-    opacity: 1;
   }
 
   .nested-btn {
@@ -276,9 +225,7 @@
     outline: none;
   }
 
-  /* Completed state styles */
   .btn.completed, .nested-btn.completed {
-    position: relative;
     color: #2e7d32;
     border-color: #2e7d32;
     box-shadow: 0 0 8px #2e7d32;
@@ -293,13 +240,21 @@
     top: 1px;
   }
 
-  /* Focus visible outline for accessibility */
   .btn:focus, .nested-btn:focus, #supportingToggle:focus {
     outline: 3px solid #ff0000;
     outline-offset: 2px;
   }
 
-  /* Responsive for small screens */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 16px;
+    z-index: 10;
+  }
+
   @media (max-width: 480px) {
     .grid {
       grid-template-columns: 1fr;
@@ -318,8 +273,7 @@
   <main class="container">
     <h1><img src="nexus.png" alt="NEXUS Logo"></h1>
 
-    <!-- Toggle button to show/hide other links -->
-    <button class="btn toggle-dropdown-btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu" type="button">
+    <button class="btn" id="dropdownToggle" aria-expanded="false" aria-controls="dropdownMenu" type="button">
       Show Tasks to Complete ▼
     </button>
 
@@ -327,8 +281,8 @@
       Apply Check Marks
     </button>
 
-    <!-- Dropdown container with all other buttons except Construction Check Sheet & Supporting Documents -->
-    <div id="dropdownMenu" class="dropdown-menu" hidden>
+    <!-- Main dropdown panel -->
+    <div id="dropdownMenu" class="dropdown-panel" aria-hidden="true">
       <section class="grid">
         <div class="btn-wrapper">
           <a class="btn task-link" href="phenolic.html" data-key="rif" target="_blank" rel="noopener noreferrer">ℹ️ RIF</a>
@@ -357,35 +311,31 @@
       </section>
     </div>
 
-    <!-- Supporting Documents separate dropdown toggle -->
+    <!-- Supporting Documents dropdown -->
     <div id="supportingDropdownContainer">
-      <button id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
+      <button class="btn" id="supportingToggle" aria-expanded="false" aria-controls="supportingDropdown" type="button">
         ℹ️ Supporting Documents ▼
       </button>
 
-      <div id="supportingDropdown" hidden>
+      <div id="supportingDropdown" class="dropdown-panel" aria-hidden="true">
         <a class="nested-btn support-link" href="transformer.html" data-key="transformer" target="_blank" rel="noopener noreferrer">
           Transformer Image
         </a>
-
         <a class="nested-btn support-link" href="supporting.html" data-key="supporting-page" target="_blank" rel="noopener noreferrer">
           Supporting Documents Page
         </a>
-
         <a class="nested-btn support-link"
            href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgDTzSdCCowiQJ0Rza9oIXlUASycInMyNn5KL8kpLPbjxkU?e=9fAnPb"
            data-key="supporting-training-powerpoint"
            target="_blank" rel="noopener noreferrer">
           Training PowerPoint Documents
         </a>
-
         <a class="nested-btn support-link"
            href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAuRbIpwO8IQog9sZN4umvUAb8FLYz2qqSu8oOUvYa1Yq4?e=QHL9IJ"
            data-key="supporting-documentation-repo"
            target="_blank" rel="noopener noreferrer">
           Supporting Documentation Repository
         </a>
-
         <a class="nested-btn support-link"
            href="https://aceelectricnet.sharepoint.com/:f:/s/CMH098QAQC/IgAQM-row4waQbd2QWYR27mvAYSIW3WLiCt2W0EwVWlYsng?e=Brrj7W"
            data-key="supporting-sop-general"
@@ -395,7 +345,6 @@
       </div>
     </div>
 
-    <!-- Always visible Construction Check Sheet button -->
     <div class="special-btn-container" style="display: flex; justify-content: center;">
       <a class="btn btn-special task-link" href="ConstructionCheckSheet.html" data-key="construction-check-sheet" target="_blank" rel="noopener noreferrer">
         Construction Check Sheet
@@ -411,107 +360,85 @@
 </footer>
 
 <script>
-  const debugLog = document.getElementById('debugLog');
+  window.addEventListener('DOMContentLoaded', () => {
+    const debugLog = document.getElementById('debugLog');
 
-  const showLabel = 'Show Tasks to Complete ▼';
-  const hideLabel = 'Hide Tasks to Complete ▲';
+    const showLabel = 'Show Tasks to Complete ▼';
+    const hideLabel = 'Hide Tasks to Complete ▲';
 
-  function getStorageKey(el) {
-    const keyFromData = el.dataset.key;
-    if (keyFromData) return `${keyFromData}Completed`;
+    function getStorageKey(el) {
+      const keyFromData = el.dataset.key;
+      if (keyFromData) return `${keyFromData}Completed`;
 
-    const href = el.getAttribute('href');
-    if (!href) return null;
+      const href = el.getAttribute('href');
+      if (!href) return null;
 
-    const pageName = href.split('/').pop();
-    return pageName ? pageName.replace('.html', '') + 'Completed' : null;
-  }
+      const pageName = href.split('/').pop();
+      return pageName ? pageName.replace('.html', '') + 'Completed' : null;
+    }
 
-  function setCompleted(el, isCompleted) {
-    const storageKey = getStorageKey(el);
-    if (!storageKey) return;
-
-    el.classList.toggle('completed', isCompleted);
-    localStorage.setItem(storageKey, String(isCompleted));
-  }
-
-  function updateCompletedStates() {
-    document.querySelectorAll('.task-link, .support-link').forEach(el => {
-      const key = getStorageKey(el);
-      if (!key) return;
-
-      const isCompleted = localStorage.getItem(key) === 'true';
-      el.classList.toggle('completed', isCompleted);
-    });
-  }
-
-  // Mark complete on click WITHOUT blocking navigation.
-  // Use capture so it runs before the browser leaves the page.
-  document.querySelectorAll('.task-link, .support-link').forEach(el => {
-    el.addEventListener('click', () => {
+    function setCompleted(el, isCompleted) {
       const storageKey = getStorageKey(el);
       if (!storageKey) return;
+      el.classList.toggle('completed', isCompleted);
+      localStorage.setItem(storageKey, String(isCompleted));
+    }
 
-      setCompleted(el, true);
+    function updateCompletedStates() {
+      document.querySelectorAll('.task-link, .support-link').forEach(el => {
+        const key = getStorageKey(el);
+        if (!key) return;
+        const isCompleted = localStorage.getItem(key) === 'true';
+        el.classList.toggle('completed', isCompleted);
+      });
+    }
 
-      debugLog.textContent = `Opened: ${el.textContent.trim()}`;
-      console.log(debugLog.textContent);
-    }, { capture: true });
+    // Mark complete on click (capture so it runs before leaving the page)
+    document.querySelectorAll('.task-link, .support-link').forEach(el => {
+      el.addEventListener('click', () => {
+        setCompleted(el, true);
+        debugLog.textContent = `Opened: ${el.textContent.trim()}`;
+      }, { capture: true });
+    });
+
+    // Generic dropdown toggler
+    function wireDropdown(buttonId, panelId, labelClosed, labelOpen) {
+      const btn = document.getElementById(buttonId);
+      const panel = document.getElementById(panelId);
+      if (!btn || !panel) {
+        if (debugLog) debugLog.textContent = `Missing dropdown elements: ${buttonId} / ${panelId}`;
+        return;
+      }
+
+      function setOpen(open) {
+        btn.setAttribute('aria-expanded', String(open));
+        panel.classList.toggle('is-open', open);
+        panel.setAttribute('aria-hidden', String(!open));
+        btn.textContent = open ? labelOpen : labelClosed;
+      }
+
+      setOpen(false);
+      btn.addEventListener('click', () => {
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        setOpen(!isOpen);
+      });
+    }
+
+    wireDropdown('dropdownToggle', 'dropdownMenu', showLabel, hideLabel);
+    wireDropdown('supportingToggle', 'supportingDropdown', 'ℹ️ Supporting Documents ▼', 'ℹ️ Supporting Documents ▲');
+
+    const applyChecksBtn = document.getElementById('applyChecksBtn');
+    if (applyChecksBtn) {
+      applyChecksBtn.addEventListener('click', () => {
+        document.querySelectorAll('.task-link, .support-link').forEach(el => setCompleted(el, true));
+        updateCompletedStates();
+      });
+    }
+
+    updateCompletedStates();
+    window.addEventListener('focus', updateCompletedStates);
+    setInterval(updateCompletedStates, 3000);
   });
-
-  // Main dropdown toggle
-  const dropdownToggle = document.getElementById('dropdownToggle');
-  const dropdownMenu = document.getElementById('dropdownMenu');
-
-  function setDropdown(open) {
-    dropdownToggle.setAttribute('aria-expanded', String(open));
-    dropdownToggle.textContent = open ? hideLabel : showLabel;
-    dropdownMenu.classList.toggle('show', open);
-    dropdownMenu.hidden = !open;
-  }
-
-  if (dropdownToggle && dropdownMenu) {
-    setDropdown(false);
-    dropdownToggle.addEventListener('click', () => {
-      const isExpanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
-      setDropdown(!isExpanded);
-    });
-  }
-
-  // Supporting Documents toggle
-  const supportingToggle = document.getElementById('supportingToggle');
-  const supportingDropdown = document.getElementById('supportingDropdown');
-
-  function setSupporting(open) {
-    supportingToggle.setAttribute('aria-expanded', String(open));
-    supportingToggle.textContent = open ? 'ℹ️ Supporting Documents ▲' : 'ℹ️ Supporting Documents ▼';
-    supportingDropdown.classList.toggle('show', open);
-    supportingDropdown.hidden = !open;
-  }
-
-  if (supportingToggle && supportingDropdown) {
-    setSupporting(false);
-    supportingToggle.addEventListener('click', () => {
-      const isExpanded = supportingToggle.getAttribute('aria-expanded') === 'true';
-      setSupporting(!isExpanded);
-    });
-  }
-
-  // Apply Check Marks: mark all as complete
-  const applyChecksBtn = document.getElementById('applyChecksBtn');
-  if (applyChecksBtn) {
-    applyChecksBtn.addEventListener('click', () => {
-      document.querySelectorAll('.task-link, .support-link').forEach(el => setCompleted(el, true));
-      updateCompletedStates();
-    });
-  }
-
-  // Run on page load and when tab refocuses
-  window.addEventListener('load', updateCompletedStates);
-  window.addEventListener('focus', updateCompletedStates);
-
-  // Poll every 3 seconds to catch changes from other tabs
-  setInterval(updateCompletedStates, 3000);
 </script>
 </body>
 </html>
