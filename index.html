@@ -523,7 +523,8 @@
       });
       updateCompletedStates();
     });
-  }
+    updateCompletedStates();
+  });
 
   // Run on page load and every time the page gains focus (when user switches back)
   window.addEventListener('load', updateCompletedStates);
