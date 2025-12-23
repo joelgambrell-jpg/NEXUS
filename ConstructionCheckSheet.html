@@ -13,6 +13,7 @@
     --overlay:rgba(0,0,0,0.75);
     --accent:#4caf50;
     --danger:#ff5252;
+    --warn:#ffd54f;
   }
 
   *{ box-sizing:border-box; }
@@ -70,6 +71,7 @@
     border:2px solid var(--accent);
     border-radius:8px;
     background:#111;
+    overflow:hidden;
   }
 
   #access-granted{
@@ -78,6 +80,21 @@
     font-weight:900;
     display:none;
   }
+
+  .status{
+    width:min(520px, 92vw);
+    font-weight:800;
+    font-size:0.95rem;
+    line-height:1.25rem;
+    padding:10px 12px;
+    border-radius:10px;
+    background: rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    word-break:break-word;
+  }
+  .status .ok{ color: var(--accent); }
+  .status .warn{ color: var(--warn); }
+  .status .bad{ color: var(--danger); }
 
   .manual-unlock{
     display:grid;
@@ -91,6 +108,7 @@
     border-radius:10px;
     border:none;
     font-weight:800;
+    outline:none;
   }
 
   .manual-unlock button{
@@ -105,6 +123,8 @@
   .overlay-actions{
     display:flex;
     gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
   }
 
   .overlay-actions button{
@@ -118,6 +138,12 @@
   .danger{
     background:var(--danger);
     color:#200;
+  }
+
+  .secondary{
+    background: rgba(255,255,255,0.16);
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.22);
   }
 
   footer{
@@ -145,14 +171,18 @@
 
       <div id="access-granted">Access Granted</div>
 
+      <div class="status" id="status">
+        <span class="warn">Status:</span> Initializing…
+      </div>
+
       <div class="manual-unlock">
-        <input id="manual-code" maxlength="7" placeholder="Manual 7-digit badge code">
-        <button id="manual-unlock-btn">Unlock</button>
+        <input id="manual-code" maxlength="7" inputmode="numeric" placeholder="Manual 7-digit badge code">
+        <button id="manual-unlock-btn" type="button">Unlock</button>
       </div>
 
       <div class="overlay-actions">
-        <button id="retry-camera">Retry Camera</button>
-        <button id="stop-camera" class="danger">Stop Camera</button>
+        <button id="retry-camera" type="button" class="secondary">Retry Camera</button>
+        <button id="stop-camera" type="button" class="danger">Stop Camera</button>
       </div>
     </div>
   </div>
@@ -161,12 +191,20 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script type="module">
-  const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwIFiuJXfvk-FlHqnF5IyBTqFBQ0LXh-mZUeP5kAGeMyn_RMILKgJqVlNlFjrnE4B7Tcg/exec";
+  const SHEET_WEBAPP_URL =
+    "https://script.google.com/macros/s/AKfycbwIFiuJXfvk-FlHqnF5IyBTqFBQ0LXh-mZUeP5kAGeMyn_RMILKgJqVlNlFjrnE4B7Tcg/exec";
 
   let qrScanner = null;
+  let isStarting = false;
+  let lastScanAt = 0;
 
   const manualInput = document.getElementById("manual-code");
   const unlockMsg = document.getElementById("access-granted");
+  const statusEl = document.getElementById("status");
+
+  function setStatus(html){
+    statusEl.innerHTML = html;
+  }
 
   function isValid(code){
     return /^\d{7}$/.test(code);
@@ -183,52 +221,146 @@
   }
 
   async function sendToSheet(payload){
-    if(!SHEET_WEBAPP_URL || !navigator.onLine) return;
-    await fetch(SHEET_WEBAPP_URL,{
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body:JSON.stringify(payload)
-    });
+    if(!SHEET_WEBAPP_URL){
+      setStatus(`<span class="bad">Status:</span> Missing Web App URL.`);
+      return false;
+    }
+
+    if(!navigator.onLine){
+      setStatus(`<span class="warn">Status:</span> Offline. Scan captured but not logged.`);
+      return false;
+    }
+
+    try{
+      const res = await fetch(SHEET_WEBAPP_URL, {
+        method: "POST",
+        // text/plain avoids CORS preflight in many setups
+        headers: { "Content-Type":"text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+
+      const text = await res.text().catch(() => "");
+
+      if(!res.ok){
+        console.error("WebApp POST failed:", res.status, text);
+        setStatus(`<span class="bad">Status:</span> Log failed (${res.status}).`);
+        return false;
+      }
+
+      setStatus(`<span class="ok">Status:</span> Logged ${payload.method.toUpperCase()} (${payload.code}).`);
+      return true;
+    }catch(err){
+      console.error("Network error posting to WebApp:", err);
+      setStatus(`<span class="bad">Status:</span> Network error logging scan.`);
+      return false;
+    }
   }
 
   async function unlock(){
     unlockMsg.style.display="block";
+    setStatus(`<span class="ok">Status:</span> Access granted.`);
     setTimeout(()=>document.getElementById("lock-overlay").style.display="none",1000);
-    if(qrScanner) await qrScanner.stop();
+    await stopScanner();
   }
 
-  async function handleCode(code, method){
-    const valid=isValid(code);
+  async function handleCode(raw, method){
+    const code = String(raw ?? "").trim();
 
-    await sendToSheet({
+    // simple debounce so one QR doesn't flood logs
+    const now = Date.now();
+    if(method === "qr" && now - lastScanAt < 900) return;
+    lastScanAt = now;
+
+    const valid = isValid(code);
+
+    setStatus(
+      `<span class="${valid ? "ok" : "warn"}">Status:</span> ` +
+      `${method === "qr" ? "QR" : "Manual"} read: ${code || "(empty)"}`
+    );
+
+    const logged = await sendToSheet({
       code,
       valid,
       method,
-      deviceId:getDeviceId(),
-      scannedAtLocalISO:new Date().toISOString()
+      deviceId: getDeviceId(),
+      scannedAtLocalISO: new Date().toISOString()
     });
 
+    // Only unlock for valid codes; logging success does not block unlock
     if(valid) unlock();
+    else if(logged) setStatus(`<span class="warn">Status:</span> Logged, but code not valid (needs 7 digits).`);
+  }
+
+  async function stopScanner(){
+    if(!qrScanner) return;
+    try{
+      const state = qrScanner.getState?.();
+      // If running or paused, stop it
+      if(state !== Html5QrcodeScannerState?.NOT_STARTED){
+        await qrScanner.stop();
+      } else {
+        await qrScanner.stop().catch(()=>{});
+      }
+    }catch(e){
+      // ignore stop errors
+    }finally{
+      try{ await qrScanner.clear?.(); }catch(e){}
+      qrScanner = null;
+    }
   }
 
   async function startScanner(){
-    qrScanner=new Html5Qrcode("qr-reader");
-    await qrScanner.start(
-      { facingMode:"environment" },
-      { fps:10, qrbox:360 },
-      txt=>handleCode(txt.trim(),"qr")
-    );
+    if(isStarting) return;
+    isStarting = true;
+
+    try{
+      await stopScanner();
+
+      setStatus(`<span class="warn">Status:</span> Starting camera…`);
+
+      qrScanner = new Html5Qrcode("qr-reader");
+
+      await qrScanner.start(
+        { facingMode:"environment" },
+        { fps: 10, qrbox: 360, disableFlip: true },
+        (txt) => handleCode(txt, "qr"),
+        (err) => {
+          // frequent decode errors are normal; don't spam UI
+          // console.debug("QR decode:", err);
+        }
+      );
+
+      setStatus(`<span class="ok">Status:</span> Camera ready. Scan badge QR.`);
+    }catch(e){
+      console.error("Camera start error:", e);
+      const msg = (e && (e.message || String(e))) || "Unknown error";
+      setStatus(`<span class="bad">Status:</span> Camera failed. Check permissions. (${msg})`);
+      await stopScanner();
+    }finally{
+      isStarting = false;
+    }
   }
 
-  document.getElementById("manual-unlock-btn").onclick=()=>{
-    const code=manualInput.value.trim();
-    if(code) handleCode(code,"manual");
+  document.getElementById("manual-unlock-btn").onclick = () => {
+    const code = manualInput.value.trim();
+    if(code) handleCode(code, "manual");
+    else setStatus(`<span class="warn">Status:</span> Enter a 7-digit badge code.`);
   };
 
-  document.getElementById("retry-camera").onclick=startScanner;
-  document.getElementById("stop-camera").onclick=()=>qrScanner?.stop();
+  document.getElementById("retry-camera").onclick = () => startScanner();
 
+  document.getElementById("stop-camera").onclick = async () => {
+    await stopScanner();
+    setStatus(`<span class="warn">Status:</span> Camera stopped.`);
+  };
+
+  // Auto-start
   startScanner();
+
+  // Helpful online/offline status updates
+  window.addEventListener("offline", () => setStatus(`<span class="warn">Status:</span> Offline.`));
+  window.addEventListener("online",  () => setStatus(`<span class="ok">Status:</span> Online.`));
 </script>
 
 <footer>
@@ -237,4 +369,3 @@
 
 </body>
 </html>
-
