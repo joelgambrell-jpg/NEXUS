@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Google Doc Access with QR Unlock</title>
+<title>Google Doc Access with QR Unlock + Sheet Logging</title>
 
 <style>
   :root{
@@ -12,7 +12,11 @@
     --shadow:#900000;
     --overlay:rgba(0,0,0,0.75);
     --accent:#4caf50;
+    --warn:#ffc107;
+    --danger:#ff5252;
   }
+
+  *{ box-sizing:border-box; }
 
   body{
     margin:0;
@@ -21,6 +25,7 @@
     min-height:100vh;
     display:flex;
     flex-direction:column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   /* Main layout: doc left, log right */
@@ -49,9 +54,31 @@
     height:100%;
   }
 
+  /* Doc fallback banner (shows if iframe fails/blocked) */
+  #doc-fallback{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:12px;
+    z-index: 9;
+    display:none;
+    padding:10px 12px;
+    border-radius:10px;
+    background: rgba(0,0,0,0.85);
+    color:#fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.35);
+    font-size:0.92rem;
+    line-height:1.25rem;
+  }
+  #doc-fallback a{
+    color:#c7e6ff;
+    font-weight:900;
+    text-decoration:underline;
+  }
+
   /* Always-visible right-side panel */
   #persistent-log{
-    flex: 0 0 380px;            /* right column width */
+    flex: 0 0 420px;
     background: rgba(0,0,0,0.85);
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0,0,0,0.4);
@@ -91,11 +118,9 @@
     cursor:pointer;
   }
 
-  #clear-log{ background:#fff; color:#000; }
   #pause-log{ background: var(--accent); color:#001a00; }
-  #pause-log.paused{ background:#ffc107; color:#2a1c00; }
-  #toggle-cloud{ background:#2196f3; color:#00142a; }
-  #toggle-cloud.off{ background:#9e9e9e; color:#111; }
+  #pause-log.paused{ background: var(--warn); color:#2a1c00; }
+  #clear-log{ background:#fff; color:#000; }
 
   .status-line{
     margin-top:10px;
@@ -118,7 +143,7 @@
     background: rgba(255,255,255,0.06);
     padding:10px 10px;
     overflow:auto;
-    flex: 1 1 auto;            /* fill remaining height */
+    flex: 1 1 auto;
     min-height: 120px;
   }
 
@@ -132,7 +157,10 @@
   .log-row:last-child{ border-bottom:0; }
 
   .ts{ color: rgba(255,255,255,0.85); font-weight:800; }
-  .code{ color:#d6ffd6; word-break:break-word; font-weight:700; }
+  .code{ color:#d6ffd6; word-break:break-word; font-weight:800; }
+  .code.invalid{ color:#ffd6d6; }
+  .code.system{ color:#c7e6ff; }
+  .code.error{ color:#ffb3b3; }
 
   /* Lock overlay stays on top of the doc area only */
   #lock-overlay{
@@ -153,11 +181,12 @@
   }
 
   #qr-reader{
-    width: 480px;
-    height: 480px;
+    width: min(480px, 92vw);
+    aspect-ratio: 1 / 1;
     border: 2px solid var(--accent);
     border-radius: 8px;
     background:#111;
+    overflow:hidden;
   }
 
   #access-granted{
@@ -172,6 +201,68 @@
     font-weight:800;
   }
 
+  .overlay-tools{
+    width:min(560px, 92vw);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:6px;
+  }
+
+  .manual-unlock{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:10px;
+    align-items:center;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 12px;
+    padding:10px;
+  }
+
+  .manual-unlock input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(0,0,0,0.25);
+    color:#fff;
+    font-weight:800;
+    outline:none;
+  }
+  .manual-unlock input::placeholder{ color: rgba(255,255,255,0.65); }
+
+  .manual-unlock button{
+    border:0;
+    border-radius:10px;
+    padding:10px 12px;
+    font-weight:900;
+    cursor:pointer;
+    background: var(--accent);
+    color:#001a00;
+  }
+
+  .overlay-secondary-actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  .overlay-secondary-actions button{
+    border:0;
+    border-radius:10px;
+    padding:10px 12px;
+    font-weight:900;
+    cursor:pointer;
+    background:#ffffff;
+    color:#000;
+  }
+  .overlay-secondary-actions button.danger{
+    background: var(--danger);
+    color:#1a0000;
+  }
+
   footer.footer{
     text-align:center;
     margin: 0 0 12px 0;
@@ -183,8 +274,8 @@
   @media (max-width: 980px){
     .layout{ flex-direction:column; height:auto; }
     #persistent-log{ flex: 0 0 auto; width:100%; min-height: 280px; }
-    #qr-reader{ width:min(92vw, 480px); height:min(92vw, 480px); }
     .container{ height: 70vh; }
+    .log-row{ grid-template-columns: 120px 1fr; }
   }
 </style>
 </head>
@@ -193,69 +284,80 @@
   <div class="layout">
     <div class="container">
       <iframe
+        id="doc-frame"
         class="google-doc-embed"
         src="https://docs.google.com/spreadsheets/d/1uTBgh3jCQLv8iNrwnnxgl3MoTwzbcUYt2uTrtYdWCuw/edit?usp=sharing"
         title="Google Sheets Document"
+        loading="lazy"
       ></iframe>
+
+      <div id="doc-fallback" role="status" aria-live="polite">
+        The document may be blocked from embedding (Google/permissions). Open it in a new tab:
+        <a id="doc-link" href="#" target="_blank" rel="noopener noreferrer">Open Google Sheet</a>
+      </div>
 
       <div id="lock-overlay">
         <div>Scan QR code on badge to gain access</div>
         <div id="qr-reader"></div>
+
         <div id="access-granted">Access Granted!</div>
         <div id="welcome-text">Welcome to Nexus Construction Check Sheet</div>
+
+        <div class="overlay-tools" aria-label="Unlock Options">
+          <div class="manual-unlock">
+            <input id="manual-code" inputmode="numeric" autocomplete="off" maxlength="7"
+                   placeholder="Manual unlock (enter 7-digit badge code)" />
+            <button id="manual-unlock-btn" type="button">Unlock</button>
+          </div>
+
+          <div class="overlay-secondary-actions">
+            <button id="retry-camera" type="button">Retry Camera</button>
+            <button id="stop-camera" class="danger" type="button">Stop Camera</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Always visible right side scan log -->
     <aside id="persistent-log" aria-label="Live Scan Log">
       <div class="scan-panel">
         <div class="title">Live Scan Log</div>
         <div class="actions">
-          <button id="toggle-cloud" class="off" type="button" title="Enable when Firebase is configured">Cloud: OFF</button>
           <button id="pause-log" type="button">Pause</button>
           <button id="clear-log" type="button">Clear</button>
         </div>
       </div>
 
-      <div class="status-line" id="cloud-status">Cloud status: not configured (local logging only)</div>
-      <div class="log-hint">Every decoded scan is logged here (timestamp + value). Upload to Firebase is optional and queued.</div>
+      <div class="status-line" id="sheet-status">Sheet logging: not configured</div>
+      <div class="log-hint">
+        Every decoded scan is logged here. Optional: send each scan to your Google Sheet using a Google Apps Script Web App endpoint.
+      </div>
       <div id="scan-log" aria-live="polite"></div>
     </aside>
   </div>
 
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-  <!-- Firebase is NOT loaded yet. When ready, follow the instructions in the module script below. -->
   <script type="module">
     /******************************************************************
-     * 1) Firebase adapter placeholders (leave as-is until ready)
+     * GOOGLE SHEET LOGGING (via Google Apps Script Web App)
+     *
+     * 1) Create Apps Script bound to your Sheet:
+     *    - Open the Google Sheet
+     *    - Extensions > Apps Script
+     *    - Paste the Apps Script code block at the bottom of this file
+     *
+     * 2) Deploy as Web App:
+     *    - Deploy > New deployment > Web app
+     *    - Execute as: Me
+     *    - Who has access: Anyone
+     *    - Copy the Web App URL
+     *
+     * 3) Paste that URL below into SHEET_WEBAPP_URL
      ******************************************************************/
-    const FIREBASE = {
-      configured: false,   // set true after init
-      enabled: false,      // Cloud ON/OFF toggle
-      app: null,
-      db: null,
-      // writeScan: async (scanObj) => { ... } // implement when configured
-    };
-
-    // WHEN READY FOR FIREBASE:
-    // 1) Uncomment imports:
-    // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    // import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    //
-    // 2) Paste config from Firebase console:
-    // const firebaseConfig = { apiKey:"...", authDomain:"...", projectId:"...", ... };
-    //
-    // 3) Initialize + write function:
-    // FIREBASE.app = initializeApp(firebaseConfig);
-    // FIREBASE.db = getFirestore(FIREBASE.app);
-    // FIREBASE.configured = true;
-    // FIREBASE.writeScan = async (scanObj) => {
-    //   await addDoc(collection(FIREBASE.db, "scans"), { ...scanObj, createdAt: serverTimestamp() });
-    // };
+    const SHEET_WEBAPP_URL = ""; // <-- paste your Apps Script Web App URL here
 
     /******************************************************************
-     * 2) Elements
+     * Elements
      ******************************************************************/
     const lockOverlay = document.getElementById('lock-overlay');
     const accessGrantedMsg = document.getElementById('access-granted');
@@ -263,13 +365,22 @@
     const scanLogEl = document.getElementById('scan-log');
     const clearBtn = document.getElementById('clear-log');
     const pauseBtn = document.getElementById('pause-log');
-    const cloudBtn = document.getElementById('toggle-cloud');
-    const cloudStatus = document.getElementById('cloud-status');
 
-    let qrScanner;
+    const manualCodeEl = document.getElementById('manual-code');
+    const manualUnlockBtn = document.getElementById('manual-unlock-btn');
+    const retryCameraBtn = document.getElementById('retry-camera');
+    const stopCameraBtn = document.getElementById('stop-camera');
+
+    const docFrame = document.getElementById('doc-frame');
+    const docFallback = document.getElementById('doc-fallback');
+    const docLink = document.getElementById('doc-link');
+
+    const sheetStatus = document.getElementById('sheet-status');
+
+    let qrScanner = null;
 
     /******************************************************************
-     * 3) Scan logging settings
+     * Logging settings
      ******************************************************************/
     const MAX_LOG_ROWS = 300;
     const DUPLICATE_WINDOW_MS = 2000;
@@ -296,7 +407,14 @@
       ts.textContent = nowTimestamp();
 
       const value = document.createElement("div");
-      value.className = "code";
+
+      const lower = (note || "").toLowerCase();
+      let cls = "";
+      if (lower.includes("invalid")) cls = "invalid";
+      if (lower.includes("system")) cls = "system";
+      if (lower.includes("error")) cls = "error";
+
+      value.className = `code ${cls}`.trim();
       value.textContent = note ? `${code} (${note})` : code;
 
       row.appendChild(ts);
@@ -324,8 +442,12 @@
       return true;
     }
 
+    function isValidCode(code){
+      return /^\d{7}$/.test(code);
+    }
+
     /******************************************************************
-     * 4) Device ID (helps identify source device in Firebase)
+     * Device ID
      ******************************************************************/
     const DEVICE_KEY = "nexus_device_id_v1";
     function getDeviceId(){
@@ -338,126 +460,116 @@
     }
 
     /******************************************************************
-     * 5) Queue (persists on device; flushes when cloud enabled)
+     * Sheet logging
      ******************************************************************/
-    const QUEUE_KEY = "nexus_scan_queue_v1";
-
-    function loadQueue(){
-      try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || "[]"); }
-      catch { return []; }
-    }
-
-    function saveQueue(queue){
-      try { localStorage.setItem(QUEUE_KEY, JSON.stringify(queue)); } catch {}
-    }
-
-    async function enqueueScan(scanObj){
-      const q = loadQueue();
-      q.unshift(scanObj);
-      if (q.length > 1000) q.length = 1000;
-      saveQueue(q);
-    }
-
-    function setCloudUI(){
-      if (!FIREBASE.configured){
-        cloudBtn.classList.add("off");
-        cloudBtn.textContent = "Cloud: OFF";
-        cloudStatus.textContent = "Cloud status: not configured (local logging only)";
+    function setSheetUI(){
+      if (!SHEET_WEBAPP_URL){
+        sheetStatus.textContent = "Sheet logging: not configured";
         return;
       }
-
-      if (FIREBASE.enabled){
-        cloudBtn.classList.remove("off");
-        cloudBtn.textContent = "Cloud: ON";
-        cloudStatus.textContent = "Cloud status: enabled (uploads + queue flush active)";
-      } else {
-        cloudBtn.classList.add("off");
-        cloudBtn.textContent = "Cloud: OFF";
-        cloudStatus.textContent = "Cloud status: configured but disabled (queueing only)";
-      }
+      sheetStatus.textContent = navigator.onLine
+        ? "Sheet logging: configured (online)"
+        : "Sheet logging: configured (offline)";
     }
 
-    async function flushQueue(){
-      if (!FIREBASE.configured || !FIREBASE.enabled || typeof FIREBASE.writeScan !== "function") return;
-      if (!navigator.onLine) return;
+    window.addEventListener("online", setSheetUI);
+    window.addEventListener("offline", setSheetUI);
 
-      const q = loadQueue();
-      if (!q.length) return;
+    async function postToSheet(scanObj){
+      if (!SHEET_WEBAPP_URL) return { ok:false, skipped:true, reason:"not_configured" };
+      if (!navigator.onLine) return { ok:false, skipped:true, reason:"offline" };
 
-      // Oldest -> newest for upload order
-      const items = q.slice().reverse();
+      // Using text/plain avoids some CORS/preflight edge cases with Apps Script
+      const res = await fetch(SHEET_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(scanObj)
+      });
 
-      const remaining = [];
-      for (const item of items){
-        try {
-          await FIREBASE.writeScan(item);
-        } catch {
-          remaining.push(item);
-        }
-      }
-
-      // Store remaining newest-first again
-      saveQueue(remaining.reverse());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json().catch(() => ({}));
+      return { ok:true, data };
     }
-
-    async function maybeCloudRecord(scanObj){
-      await enqueueScan(scanObj);
-      await flushQueue();
-    }
-
-    window.addEventListener("online", flushQueue);
 
     /******************************************************************
-     * 6) Unlock behavior (hides only the overlay; log stays visible)
+     * Unlock behavior
      ******************************************************************/
-    function unlockAccess(){
+    async function stopScanner(){
+      if (!qrScanner) return;
+      try { await qrScanner.stop(); } catch {}
+      try { qrScanner.clear?.(); } catch {}
+      qrScanner = null;
+    }
+
+    async function unlockAccess(){
       accessGrantedMsg.style.display = "block";
       setTimeout(() => { lockOverlay.style.display = "none"; }, 1200);
-      if (qrScanner) qrScanner.stop();
+      await stopScanner();
     }
 
     /******************************************************************
-     * 7) Scan callback (logs + queues + optional Firebase)
+     * Scan callback
      ******************************************************************/
     const onScanSuccess = async (decodedText) => {
       const code = (decodedText || "").trim();
       if (!code) return;
       if (!shouldLog(code)) return;
 
-      const isValid = /^\d{7}$/.test(code);
-      appendLog(code, isValid ? "valid" : "invalid");
+      const valid = isValidCode(code);
+      appendLog(code, valid ? "valid" : "invalid");
 
       const scanObj = {
         code,
-        valid: isValid,
-        scannedAtLocal: new Date().toISOString(),
-        deviceId: getDeviceId()
+        valid,
+        scannedAtLocalISO: new Date().toISOString(),
+        scannedAtLocalText: nowTimestamp(),
+        deviceId: getDeviceId(),
+        method: "qr"
       };
 
-      await maybeCloudRecord(scanObj);
+      try {
+        const r = await postToSheet(scanObj);
+        if (r?.ok) appendLog(code, "sent to sheet");
+        else if (r?.skipped && r.reason === "offline") appendLog(code, "queued: offline (not stored)"); // optional: add queue if you want
+        else if (r?.skipped) appendLog(code, "sheet logging not configured");
+      } catch (e) {
+        appendLog(code, "error sending to sheet");
+      }
 
-      if (isValid) unlockAccess();
+      if (valid) await unlockAccess();
     };
 
-    function startScanner(){
+    async function startScanner(){
+      await stopScanner();
+
+      if (!window.Html5Qrcode){
+        appendLog("html5-qrcode library not loaded", "system");
+        alert("QR scanner library failed to load.");
+        return;
+      }
+
       qrScanner = new Html5Qrcode("qr-reader");
       const config = { fps: 10, qrbox: { width: 360, height: 360 } };
 
-      qrScanner.start({ facingMode: "environment" }, config, onScanSuccess)
-        .catch(() =>
-          qrScanner.start({ facingMode: "user" }, config, onScanSuccess)
-            .catch(() => alert("Failed to start camera for QR scanning. Please check permissions."))
-        );
+      try {
+        await qrScanner.start({ facingMode: "environment" }, config, onScanSuccess);
+      } catch {
+        try {
+          await qrScanner.start({ facingMode: "user" }, config, onScanSuccess);
+        } catch {
+          appendLog("Failed to start camera (permissions?)", "system");
+          alert("Failed to start camera for QR scanning. Please check permissions.");
+        }
+      }
     }
 
     /******************************************************************
-     * 8) Controls
+     * Controls
      ******************************************************************/
     clearBtn.addEventListener("click", () => {
       scanLogEl.innerHTML = "";
       lastSeen.clear();
-      localStorage.removeItem(QUEUE_KEY);
-      appendLog("Cleared log + local queue", "system");
+      appendLog("Cleared log", "system");
     });
 
     pauseBtn.addEventListener("click", () => {
@@ -466,27 +578,140 @@
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
 
-    cloudBtn.addEventListener("click", async () => {
-      if (!FIREBASE.configured){
-        appendLog("Cloud not configured yet", "system");
-        setCloudUI();
+    manualCodeEl.addEventListener("input", () => {
+      manualCodeEl.value = manualCodeEl.value.replace(/[^\d]/g, "").slice(0, 7);
+    });
+
+    manualUnlockBtn.addEventListener("click", async () => {
+      const code = (manualCodeEl.value || "").trim();
+      if (!code){
+        appendLog("Manual unlock attempted with empty code", "system");
         return;
       }
-      FIREBASE.enabled = !FIREBASE.enabled;
-      setCloudUI();
-      if (FIREBASE.enabled) await flushQueue();
+      if (!shouldLog(code)) return;
+
+      const valid = isValidCode(code);
+      appendLog(code, valid ? "valid (manual)" : "invalid (manual)");
+
+      const scanObj = {
+        code,
+        valid,
+        scannedAtLocalISO: new Date().toISOString(),
+        scannedAtLocalText: nowTimestamp(),
+        deviceId: getDeviceId(),
+        method: "manual"
+      };
+
+      try {
+        const r = await postToSheet(scanObj);
+        if (r?.ok) appendLog(code, "sent to sheet");
+        else if (r?.skipped) appendLog(code, "sheet logging not configured");
+      } catch {
+        appendLog(code, "error sending to sheet");
+      }
+
+      if (valid) await unlockAccess();
+    });
+
+    retryCameraBtn.addEventListener("click", async () => {
+      appendLog("Retrying camera...", "system");
+      await startScanner();
+    });
+
+    stopCameraBtn.addEventListener("click", async () => {
+      appendLog("Camera stopped", "system");
+      await stopScanner();
     });
 
     /******************************************************************
-     * 9) Boot
+     * Iframe embed checks + fallback link
      ******************************************************************/
-    window.addEventListener("load", () => {
-      appendLog("Scanner initializing...", "system");
-      setCloudUI();
-      startScanner();
+    const docUrl = docFrame.getAttribute("src");
+    docLink.href = docUrl;
+
+    let iframeLoaded = false;
+    docFrame.addEventListener("load", () => {
+      iframeLoaded = true;
+      docFallback.style.display = "none";
     });
+    setTimeout(() => {
+      if (!iframeLoaded) docFallback.style.display = "block";
+    }, 2500);
+
+    /******************************************************************
+     * Boot
+     ******************************************************************/
+    window.addEventListener("load", async () => {
+      appendLog("Scanner initializing...", "system");
+      setSheetUI();
+      await startScanner();
+    });
+
+    window.addEventListener("beforeunload", () => { stopScanner(); });
+    document.addEventListener("visibilitychange", () => { if (document.hidden) stopScanner(); });
   </script>
 
+  <!--
+  ===========================
+  GOOGLE APPS SCRIPT (PASTE)
+  ===========================
+
+  1) In your Google Sheet: Extensions > Apps Script
+  2) Paste this code, save
+  3) Deploy > New deployment > Web app
+     - Execute as: Me
+     - Who has access: Anyone
+  4) Copy Web app URL and paste into SHEET_WEBAPP_URL above.
+
+  NOTE:
+  - This appends rows into a tab named "Scans". If it doesn't exist, it will create it.
+  - Columns: Timestamp (ISO), Timestamp (Text), Code, Valid, DeviceId, Method, UserAgent, IP (if available)
+
+  ---- Apps Script code ----
+
+  function doPost(e) {
+    try {
+      var raw = (e && e.postData && e.postData.contents) ? e.postData.contents : "";
+      var obj = raw ? JSON.parse(raw) : {};
+
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var sheet = ss.getSheetByName("Scans") || ss.insertSheet("Scans");
+
+      // Add header if empty
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow([
+          "scannedAtLocalISO",
+          "scannedAtLocalText",
+          "code",
+          "valid",
+          "deviceId",
+          "method",
+          "userAgent"
+        ]);
+      }
+
+      sheet.appendRow([
+        obj.scannedAtLocalISO || new Date().toISOString(),
+        obj.scannedAtLocalText || "",
+        obj.code || "",
+        obj.valid === true,
+        obj.deviceId || "",
+        obj.method || "",
+        obj.userAgent || ""
+      ]);
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+
+    } catch (err) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  -->
   <footer class="footer">
     © Intellectual Property of NEXUS Data Science. Created in joint venture with ACE Electric. All rights reserved.
   </footer>
