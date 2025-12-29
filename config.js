@@ -122,7 +122,9 @@ transformer: {
   sectionTitle: "Transformer",
   backgroundImage: "transformer.jpg",
   completedKey: "transformerViewed",
-  embedUrl: "transformer.html"
+  imageUrl: "single_line.png",
+  magnifier: true,
+  zoom: 4
 },
 
   supporting: {
