@@ -117,15 +117,15 @@ window.FORMS = {
     ]
   },
 
-transformer: {
-  title: "Transformer",
-  sectionTitle: "Transformer",
-  backgroundImage: "transformer.jpg",
-  completedKey: "transformerViewed",
-  imageUrl: "single_line.png",
-  magnifier: true,
-  zoom: 4
-},
+  transformer: {
+    title: "Transformer",
+    sectionTitle: "Transformer",
+    backgroundImage: "transformer.jpg",
+    completedKey: "transformerViewed",
+    imageUrl: "single_line.png",
+    magnifier: true,
+    zoom: 4
+  },
 
   supporting: {
     title: "Supporting Documents",
@@ -147,7 +147,7 @@ transformer: {
       },
       {
         text: "Transformer Image",
-        href: "form.html?id=transformer"
+        href: "?id=transformer"
       }
     ]
   },
