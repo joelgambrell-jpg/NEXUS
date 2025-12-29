@@ -59,16 +59,13 @@
     display: block;
   }
 
-  /* Base grid (kept) */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
   }
 
-  .btn-wrapper {
-    position: relative;
-  }
+  .btn-wrapper { position: relative; }
 
   .btn {
     width: 100%;
@@ -129,22 +126,14 @@
     opacity: 1;
   }
 
-  /* === UPSIDE-DOWN PYRAMID LAYOUT (new) ===
-     - Keeps your button styling intact
-     - Applies to BOTH dropdowns by using .pyramid on the section
-     - JS assigns --colspan per item so it works for any count
-  */
   .pyramid {
     grid-template-columns: repeat(12, 1fr);
     justify-items: stretch;
     align-items: stretch;
   }
 
-  .pyramid > .btn-wrapper {
-    grid-column: span var(--colspan, 4);
-  }
+  .pyramid > .btn-wrapper { grid-column: span var(--colspan, 4); }
 
-  /* Center each row inside the 12-col grid */
   .pyramid-row {
     grid-column: 1 / -1;
     display: grid;
@@ -152,22 +141,13 @@
     gap: 16px;
   }
 
-  .pyramid-row > .btn-wrapper {
-    grid-column: span var(--colspan, 4);
-  }
+  .pyramid-row > .btn-wrapper { grid-column: span var(--colspan, 4); }
 
-  /* Mobile fallback: normal 1-column stack */
   @media (max-width: 700px) {
-    .pyramid {
-      grid-template-columns: 1fr;
-    }
-    .pyramid-row {
-      grid-template-columns: 1fr;
-    }
+    .pyramid { grid-template-columns: 1fr; }
+    .pyramid-row { grid-template-columns: 1fr; }
     .pyramid > .btn-wrapper,
-    .pyramid-row > .btn-wrapper {
-      grid-column: auto !important;
-    }
+    .pyramid-row > .btn-wrapper { grid-column: auto !important; }
   }
 
   .btn-special {
@@ -204,23 +184,23 @@
 <div id="dropdownMenu" class="dropdown-menu">
   <section class="grid pyramid" id="tasksGrid">
     <div class="btn-wrapper">
-      <a class="btn" href="RIF.html" target="_blank"> RIF</a>
+      <a class="btn" href="form.html?id=rif" target="_blank">RIF</a>
       <span class="tooltip">Review the RIF task</span>
     </div>
     <div class="btn-wrapper">
-      <a class="btn" href="lvt-meg-cover-sheet.html" target="_blank"> Megohmmeter Testing</a>
+      <a class="btn" href="form.html?id=lvt" target="_blank">Megohmmeter Testing</a>
       <span class="tooltip">Complete Megohmmeter Testing</span>
     </div>
     <div class="btn-wrapper">
-      <a class="btn" href="torque.html" target="_blank"> Torque</a>
+      <a class="btn" href="form.html?id=torque" target="_blank">Torque</a>
       <span class="tooltip">View Torque resources</span>
     </div>
     <div class="btn-wrapper">
-      <a class="btn" href="l2.html" target="_blank"> L2-IVF</a>
+      <a class="btn" href="form.html?id=l2" target="_blank">L2-IVF</a>
       <span class="tooltip">Complete L2-IVF</span>
     </div>
     <div class="btn-wrapper">
-      <a class="btn" href="prefod.html" target="_blank"> Pre-FOD</a>
+      <a class="btn" href="form.html?id=prefod" target="_blank">Pre-FOD</a>
       <span class="tooltip">Complete Pre-FOD</span>
     </div>
   </section>
@@ -232,11 +212,11 @@
   <div id="supportingDropdown" class="dropdown-menu">
     <section class="grid pyramid" id="supportingGrid">
       <div class="btn-wrapper">
-        <a class="btn" href="transformer.html" target="_blank">🖼️ Transformer Image</a>
+        <a class="btn" href="form.html?id=transformer" target="_blank">🖼️ Transformer Image</a>
         <span class="tooltip">Open transformer image/resources</span>
       </div>
       <div class="btn-wrapper">
-        <a class="btn" href="supporting.html" target="_blank">📄 Supporting Documents Page</a>
+        <a class="btn" href="form.html?id=supporting" target="_blank">📄 Supporting Documents Page</a>
         <span class="tooltip">Open the supporting documents hub</span>
       </div>
       <div class="btn-wrapper">
@@ -256,7 +236,7 @@
 </div>
 
 <div style="display:flex;justify-content:center;">
-  <a class="btn btn-special" href="ConstructionCheckSheet.html" target="_blank">
+  <a class="btn btn-special" href="form.html?id=construction" target="_blank">
     Construction Check Sheet
   </a>
 </div>
@@ -290,19 +270,10 @@
         : 'Supporting Documents ▼';
   };
 
-  // Build an upside-down pyramid: widest row on top, then fewer items per row.
-  // Uses a 12-column grid and sets per-item colspan so rows are centered.
   function applyPyramid(sectionEl) {
     if (!sectionEl) return;
-
-    // Get only the direct button wrappers (ignore any rows if re-applied)
     const items = Array.from(sectionEl.children).filter(el => el.classList.contains('btn-wrapper'));
-
-    // Reset section
     sectionEl.innerHTML = '';
-
-    // Decide row sizes: start at 3, then 2, then 1, repeat if more items exist.
-    // For 5 items -> [3,2]. For 6 -> [3,2,1]. For 7 -> [3,2,1,1] etc.
     const pattern = [3, 2, 1];
     let idx = 0;
     let pat = 0;
@@ -314,21 +285,14 @@
       const row = document.createElement('div');
       row.className = 'pyramid-row';
 
-      // Column span per item so the row fills 12 columns evenly.
-      // Example: 3 items -> span 4 each, 2 items -> span 6 each, 1 item -> span 6 (and we center with offsets)
       const span = Math.floor(12 / take);
 
       for (let i = 0; i < take; i++) {
         const it = items[idx + i];
         it.style.setProperty('--colspan', span);
-
-        // Centering offsets: place items so they "sit" centered within 12 columns
-        // We do this by adding left padding columns via a wrapper "ghost" if needed.
         row.appendChild(it);
       }
 
-      // Center the row by adding an invisible spacer if the row doesn't naturally center well
-      // For 1 item, create two spacers of equal width around it.
       if (take === 1) {
         const left = document.createElement('div');
         left.style.gridColumn = 'span 3';
@@ -340,21 +304,13 @@
         row.appendChild(right);
       }
 
-      // For 2 items, add left/right spacers to center the pair slightly (optional polish)
-      if (take === 2) {
-        const left = document.createElement('div');
-        left.style.gridColumn = 'span 0';
-        row.insertBefore(left, row.firstChild);
-      }
-
       sectionEl.appendChild(row);
 
       idx += take;
-      pat = Math.min(pat + 1, pattern.length - 1); // after reaching 1, keep using 1
+      pat = Math.min(pat + 1, pattern.length - 1);
     }
   }
 
-  // Apply pyramid layout to BOTH dropdowns
   applyPyramid(document.getElementById('tasksGrid'));
   applyPyramid(document.getElementById('supportingGrid'));
 </script>
