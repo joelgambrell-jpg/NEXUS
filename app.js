@@ -42,13 +42,13 @@
   }
 
   // IMAGE MODE (Transformer)
-  if (cfg.imageUrl) {
-    buttonsWrap.style.display = "none";
-    mediaEl.style.display = "block";
-    mediaEl.innerHTML = `<img src="${cfg.imageUrl}" alt="${cfg.title || "Image"}">`;
-    markDone();
-    return;
-  }
+if (cfg.embedUrl) {
+  buttonsWrap.style.display = "none";
+  mediaEl.style.display = "block";
+  mediaEl.innerHTML = `<iframe class="embed" src="${cfg.embedUrl}" title="${cfg.title || ""}"></iframe>`;
+  markDone();
+  return;
+}
 
   // BUTTON MODE
   buttonsWrap.style.display = "inline-block";
