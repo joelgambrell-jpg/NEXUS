@@ -117,13 +117,13 @@ window.FORMS = {
     ]
   },
 
-  transformer: {
-    title: "Transformer",
-    sectionTitle: "Transformer",
-    backgroundImage: "transformer.jpg",
-    completedKey: "transformerViewed",
-    imageUrl: "single_line.png"
-  },
+transformer: {
+  title: "Transformer",
+  sectionTitle: "Transformer",
+  backgroundImage: "transformer.jpg",
+  completedKey: "transformerViewed",
+  embedUrl: "transformer.html"
+},
 
   supporting: {
     title: "Supporting Documents",
