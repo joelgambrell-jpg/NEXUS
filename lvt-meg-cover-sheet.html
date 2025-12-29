@@ -6,7 +6,6 @@
 <title>LVT Meg Cover Sheet</title>
 
 <style>
-/* === PAGE BACKGROUND IMAGE (FROM REPO) === */
 body{
   margin:0;
   padding:0;
@@ -14,14 +13,13 @@ body{
   color:#fff;
 
   background-color:#b60000;
-  background-image:url("Transformer.jpg"); /* fixed */
+  background-image:url("transformer.jpg"); /* fixed to actual repo filename */
   background-repeat:no-repeat;
   background-position:center center;
   background-size:cover;
   background-attachment:fixed;
 }
 
-/* === GLASS PANEL === */
 .container{
   max-width:900px;
   margin:40px auto;
@@ -32,7 +30,6 @@ body{
   text-align:center;
 }
 
-/* === HEADINGS === */
 h1{
   font-size:32px;
   font-weight:700;
@@ -55,7 +52,6 @@ h1{
   margin-bottom:20px;
 }
 
-/* === NEON BUTTONS === */
 .btn{
   display:inline-block;
   margin:20px 0;
@@ -85,7 +81,6 @@ h1{
   color:#6eeaff;
 }
 
-/* === IMAGE + OVERLAY BUTTONS === */
 .photo-block{
   position:relative;
   width:100%;
@@ -117,7 +112,7 @@ h1{
 <div class="section-title">Megohmmeter Testing of Conductors</div>
 
 <div class="photo-block">
-  <img src="Transformer.jpg" class="hero-img" alt="Transformer Image">
+  <img src="transformer.jpg" class="hero-img" alt="Transformer Image">
 
   <div class="center-buttons">
     <a class="btn"
@@ -137,7 +132,6 @@ h1{
 </div>
 
 <script>
-  // Mark this page as completed when any button is clicked
   document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', () => {
       localStorage.setItem('lvt-meg-cover-sheetCompleted', 'true');
