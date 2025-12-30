@@ -51,6 +51,13 @@ h1{
   padding-bottom:6px;
 }
 
+/* ===== EQUIPMENT LABEL (STEP 3) ===== */
+.eq-label{
+  font-weight:900;
+  margin:10px 0 18px;
+  font-size:18px;
+}
+
 /* ===== BUTTON PANEL ===== */
 .button-panel{
   display:inline-block;
@@ -179,6 +186,10 @@ h1{
   <a class="back" href="index.html">← Back to Home</a>
 
   <h1 id="page-title">Loading…</h1>
+
+  <!-- STEP 3: equipment label shows eq from URL -->
+  <div id="eqLabel" class="eq-label"></div>
+
   <div class="section-title" id="section-title"></div>
 
   <div id="buttonsWrap" class="button-panel">
@@ -191,6 +202,16 @@ h1{
 <!-- Scripts -->
 <script src="config.js"></script>
 <script src="app.js"></script>
+
+<!-- STEP 3: show equipment on the page -->
+<script>
+  (function () {
+    const eq = new URLSearchParams(location.search).get("eq") || "";
+    const el = document.getElementById("eqLabel");
+    if (!el) return;
+    el.textContent = eq ? `Equipment: ${eq}` : "";
+  })();
+</script>
 
 </body>
 </html>
