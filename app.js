@@ -1,6 +1,7 @@
 (function () {
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
+  const eq = params.get("eq") || ""; // ✅ STEP 3: equipment id from URL
 
   if (!id || !window.FORMS || !window.FORMS[id]) {
     document.body.innerHTML =
@@ -16,6 +17,10 @@
   document.title = cfg.title || "Form";
   document.getElementById("page-title").textContent = cfg.title || "";
   document.getElementById("section-title").textContent = cfg.sectionTitle || "";
+
+  // ✅ STEP 3: show equipment label (if element exists in form.html)
+  const eqLabel = document.getElementById("eqLabel");
+  if (eqLabel) eqLabel.textContent = eq ? `Equipment: ${eq}` : "";
 
   if (cfg.backgroundImage) {
     document.body.style.backgroundImage = `url("${cfg.backgroundImage}")`;
@@ -91,7 +96,6 @@
         const glass = magnifier;
         const bw = 6;
 
-        // ensure image has layout
         const iw = imgEl.width;
         const ih = imgEl.height;
 
@@ -138,7 +142,6 @@
       function openModal() {
         modal.style.display = "flex";
         document.body.style.overflow = "hidden";
-        // wait a tick to ensure modal image dimensions are available
         requestAnimationFrame(() => magnify(modalImg, zoom));
       }
 
@@ -151,7 +154,6 @@
       img.addEventListener("click", openModal);
       closeBtn.addEventListener("click", closeModal);
 
-      // IMPORTANT: Navigate within the SAME tab (no iframe weirdness)
       homeBtn.addEventListener("click", () => {
         closeModal();
         window.location.href = "index.html";
@@ -179,6 +181,21 @@
     a.className = "btn";
     a.textContent = b.text || "Open";
     a.href = b.href || "#";
+
+    // ✅ Carry eq through internal links created in config (e.g. "?id=transformer")
+    if (eq) {
+      // If config uses "?id=xyz" (internal jump)
+      if (typeof b.href === "string" && b.href.startsWith("?id=")) {
+        a.href = `form.html${b.href}&eq=${encodeURIComponent(eq)}`;
+      }
+
+      // If config uses "form.html?id=xyz"
+      if (a.href.includes("form.html?id=")) {
+        const u = new URL(a.href, location.href);
+        u.searchParams.set("eq", eq);
+        a.href = u.pathname + u.search;
+      }
+    }
 
     if (/^https?:\/\//i.test(a.href)) {
       a.target = "_blank";
